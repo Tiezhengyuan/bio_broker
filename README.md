@@ -1,18 +1,18 @@
 # bio_broker
 Retrieve, download, and integrate data from bioinformatics databases.
 
-# Objectives
+# 1. Objectives
 
 
 
-# installation
+# 2. installation
 
-#Tests
+# 3. Tests
 
 
-## Unit testing
+## 3.1. Unit testing
 
-## local testing
+## 3.2. local testing
 
 
 
