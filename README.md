@@ -1,35 +1,48 @@
 # bio_broker
 This bioinformatic library offers toolts that could retrieve, download, and integrate data from bioinformatics databases.
 
-# 1. Objectives
+# 1. Introduction
 
-## Functionality:
+## Functionality
 - Download reference genome from NCBI, EBI, etc.
 - Retrieve sequences based on certain references namely accession number.
 - Retrieve and integrate ontology terminology.
 - Integrate genome annotations.
 
-## Target users:
+## Target users
 - Developers who may borrow some source code for their development.
 - Bioinformaticians who may wrap bio-broker and develop their pipelines.
 - Data engineers who may apply bio-broker to integrate bioinformatics data and develop databases.
 - Biologists who want to compare their own data with public data and perform association analysis.
 
+## Recommendations
+- bio-broker could work as middle layer for a bioinformatics web service,
+  or integrated into a certain bioinformatics pipelines.
+- bio-broker could integrate various source of biomedical data and serve
+  design of new databases.
+- Bioinformatics developer is recommended to keep consistency between requirements
+  and source coding work.
+
 
 # 2. installation
-Bio-broker is developed and tested under Python 3.8.
+Bio-broker is developed and tested under Python 3.8. Steps of installation is described as the below:
 
+>git clone git@github.com:Tiezhengyuan/bio_broker.git
+>cd bio_broker
 >pip install -r requirements.txt
 
 # 3. Tests
 
+Design and Devlopment of bio-broker follows process of Test-Driven Development(TDD).
+In this process, all needs are elicited into requirements, and converted into source code.
+Most source code should be covered by unit tests and local tests with >80% coverage.
 
 ## 3.1. Unit testing
-
+Unit testing include many testing cases that test functionality of single class or method.
 > pytest tests/unittests
 
-## 3.2. local testing
-
+## 3.2. Local testing
+For local testing, testing cases make sure that a certain function is working.
 > pytest tests/localtests
 
 
