@@ -27,9 +27,11 @@ This bioinformatic library offers toolts that could retrieve, download, and inte
 # 2. installation
 Bio-broker is developed and tested under Python 3.8. Steps of installation is described as the below:
 
->git clone git@github.com:Tiezhengyuan/bio_broker.git
->cd bio_broker
->pip install -r requirements.txt
+'''
+git clone git@github.com:Tiezhengyuan/bio_broker.git
+cd bio_broker
+pip install -r requirements.txt
+'''
 
 # 3. Tests
 
@@ -39,12 +41,19 @@ Most source code should be covered by unit tests and local tests with >80% cover
 
 ## 3.1. Unit testing
 Unit testing include many testing cases that test functionality of single class or method.
-> pytest tests/unittests
+
+'''
+pytest tests/unittests
+'''
 
 ## 3.2. Local testing
 For local testing, testing cases make sure that a certain function is working.
-> pytest tests/localtests
 
+'''
+pytest tests/localtests
+'''
 
 # references
-TCGA: https://docs.cancergenomicscloud.org/docs/tcga-data
+THE CANCER GENOME ATLAS (TCGA) PROJECT: https://docs.cancergenomicscloud.org/docs/tcga-data
+Gene Ontology: http://geneontology.org/docs/ontology-documentation/
+API of GO: http://api.geneontology.org/api
