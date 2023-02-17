@@ -61,3 +61,16 @@ class File:
             print(self.infile, 'didnot exit!')
             pass
         return outlist
+
+    def file_to_dict(self, pattern=","):
+        outdict={}
+        IN=open(self.infile, 'r')
+        for line in IN:
+            line = line.rstrip()
+            if line.startswith('#'):
+                continue
+            else:
+                items=line.split(pattern)
+                outdirct[items[0]]=items[1]
+        IN.close()
+        return outdirct
