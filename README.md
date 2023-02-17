@@ -1,5 +1,7 @@
-# bio_broker
-This bioinformatic library offers toolts that could retrieve, download, and integrate data from bioinformatics databases.
+# bioBroker
+bioBroker is a bioinformatic library offers tremendous classes and methods
+that could retrieve, download, and integrate various data.
+Those classes or methods could be middleware of other bioinformatics applications.
 
 # 1. Introduction
 
@@ -16,7 +18,7 @@ This bioinformatic library offers toolts that could retrieve, download, and inte
 - Biologists who want to compare their own data with public data and perform association analysis.
 
 ## Recommendations
-- bio-broker could work as middle layer for a bioinformatics web service,
+- bioBroker could work as middle layer for a bioinformatics web service,
   or integrated into a certain bioinformatics pipelines.
 - bio-broker could integrate various source of biomedical data and serve
   design of new databases.
@@ -27,7 +29,7 @@ This bioinformatic library offers toolts that could retrieve, download, and inte
 # 2. installation
 
 ## install bio-broker
-bio-broker is developed and tested under Python 3.8. Steps of installation is described as the below:
+bioBroker is developed and tested under Python 3.8. Steps of installation is described as the below:
 
 '''
 git clone git@github.com:Tiezhengyuan/bio_broker.git

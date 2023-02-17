@@ -38,4 +38,12 @@ class Threading:
             pool.map(func, args_list)
             pool.close()
             pool.join()  
-            
+
+
+    @staticmethod
+    def run_tool(self,command):
+        print("@@@@@@@@@@@@", command)
+        output="NA"
+        output=subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).stdout.read()  
+        #        
+        return output
