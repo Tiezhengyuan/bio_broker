@@ -25,13 +25,23 @@ This bioinformatic library offers toolts that could retrieve, download, and inte
 
 
 # 2. installation
-Bio-broker is developed and tested under Python 3.8. Steps of installation is described as the below:
+
+## install bio-broker
+bio-broker is developed and tested under Python 3.8. Steps of installation is described as the below:
 
 '''
 git clone git@github.com:Tiezhengyuan/bio_broker.git
 cd bio_broker
 pip install -r requirements.txt
 '''
+
+## install Redis
+Run the following command from the shell. The docker should be run at host=127.0.0.1, port=6379.
+'''
+docker pull redis
+docker run -it --rm --name redis -p 6379:6379 redis
+'''
+
 
 # 3. Tests
 
