@@ -9,6 +9,7 @@ class HTTP:
     
     def retrieve_data(self, path=None, parameters=None):
         url = f"{self.endpoint}{path}" if path else self.endpoint
+        # print(url)
         if parameters:
             par = '&'.join([ f"{k}={v}" for k,v in parameters.items()])
             url += f"?{par}"

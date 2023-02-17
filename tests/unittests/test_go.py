@@ -14,5 +14,4 @@ class Test_(TestCase):
 
     def test_get_bioentity(self):
         res = self.c.get_bioentity('GO:0006915')
-        bioentity = res.get('bioentity', {})
-        assert bioentity.get('lable') == "apoptotic process"
+        assert res.get('label') == "apoptotic process"

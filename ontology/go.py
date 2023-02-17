@@ -6,7 +6,7 @@ from connector.http import HTTP
 
 
 class GeneOntology:
-    self.cache = {}
+    cache = {}
 
     def __init__(self):
         endpoint = "http://api.geneontology.org/api/"
