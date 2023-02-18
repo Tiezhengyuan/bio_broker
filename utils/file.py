@@ -15,25 +15,7 @@ class File:
             in_obj = open(self.infile, 'rt')
         return in_obj
 
-    def read_sample_file(self):
-        '''
-        Read the sample file
-        '''
-        sample_info={}
-        #
-        try: 
-            in_obj = self.readonly_handle(self.infile)
-            for line in in_obj:
-                line=line.strip()
-                sample_name, name_part, on = line.split(',')
-                if on=='yes':
-                    sample_info[sample_name]=name_part
-            in_obj.close()
-        except FileNotFoundError:
-            print(self.infile, 'didnot exit!')
-            pass
-        #print(sample_info)
-        return(sample_info)
+
 
 
     def list_to_file(self, inlist, out_file):

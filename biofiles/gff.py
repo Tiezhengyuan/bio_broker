@@ -52,3 +52,17 @@ class GFF:
         command = "{} -r {} -o {} {}".format(exe, genome_gtf_file, outdir, gff_col)
         #print(command)
         Threading.run_tool(command)
+
+#
+    def read_gff(self, collinear_prefix):
+        gff_dict={}
+        in_obj=open(collinear_prefix+'.gff', 'r')
+        for line in in_obj:
+            line=line.rstrip()
+            contig_name, geneID, start,end=line.split('\t')
+            if contig_name not in gff_dict.keys():
+                gff_dict[contig_name]={}
+            gff_dict[contig_name][geneID]=(int(start),int(end))
+        in_obj.close()
+        #print([(x, len(gff_dict[x])) for x in gff_dict.keys()])
+        return gff_dict
