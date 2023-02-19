@@ -1,8 +1,8 @@
-
+from Bio import Seq, SeqIO, SeqRecord
 
 class FASTQ:
-    def __init__(self, fastq_file):
-        self.fastq_file = fastq_file
+    def __init__(self, fq_file):
+        self.fq_file = fq_file
 
     def read_fq(self):
         '''
@@ -71,5 +71,5 @@ class FASTQ:
                     out_fastq = open(no_splint_file, 'w')
                     out_fastq.write('>' + name + '\n' + sequence + '\n+\n' + quality + '\n')
 
-        def demultiplexing(self, indir):
-            pass
+    def demultiplexing(self, indir):
+        pass

@@ -16,8 +16,6 @@ class File:
         return in_obj
 
 
-
-
     def list_to_file(self, inlist, out_file):
         '''
         export list to a text file seperated by return
@@ -45,14 +43,14 @@ class File:
         return outlist
 
     def file_to_dict(self, pattern=","):
+        '''
+        read text file into dictionary
+        '''
         outdict={}
-        IN=open(self.infile, 'r')
-        for line in IN:
-            line = line.rstrip()
-            if line.startswith('#'):
-                continue
-            else:
-                items=line.split(pattern)
-                outdirct[items[0]]=items[1]
-        IN.close()
+        with open(self.infile, 'r') as f:
+            for line in f:
+                line = line.rstrip()
+                if not line.startswith('#'):
+                    items=line.split(pattern)
+                    outdirct[items[0]]=items[1]
         return outdirct

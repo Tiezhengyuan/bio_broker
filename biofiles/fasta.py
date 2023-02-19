@@ -11,7 +11,6 @@ class FASTA:
     def __init__(self, fa_file):
         self.fa_file = fa_file
 
-
     def read_handler(self)->Iterable:
         '''
         read sequence one by one
@@ -38,6 +37,16 @@ class FASTA:
                 SeqIO.write(sequences, f, "fasta")
         except Exception as e:
             print(e)
+
+    def fasta_to_dict(self):
+        '''
+        map id~sequence
+        '''
+        ref_dict = {}
+        for seq in self.read_handler():
+            ref_dict[seq.id] = seq.seq
+        return ref_dict
+
 
     @staticmethod
     def read_fa(self, fa_file):
@@ -88,29 +97,6 @@ class FASTA:
         #print(ref_end['chr'])
         return ref_dict, ref_list, ref_start,ref_end
     
-    @staticmethod
-    def fa_dict(self, file_fa):
-        '''
-        '''
-        n=0
-        #store accession: sequences
-        ref_dict = {}
-        ref_list = []
-        in_obj=ab.basic().readonly_handle(file_fa)
-        #read fa file
-        for line in in_obj:
-            line = line.rstrip()
-            if line.find(">") == 0:
-                #acc = self.acc_number(line)
-                acc = re.sub(r"^>", "", line.split(" ")[0])
-                ref_list.append(acc)
-                ref_dict[acc] = []
-                n+=1
-            else:
-                ref_dict[acc].append(line)
-        in_obj.close()
-        print('Number of sequences:', n)
-        return ref_dict, ref_list
     
     @staticmethod
     def read_fa_files(self, outfile, genome_names, sub_args):

@@ -38,3 +38,13 @@ class Test_(TestCase):
         sequences = iter([SeqRecord.SeqRecord(Seq.Seq('ATCG'), id='1'),])
         outfile = os.path.join(DIR_DATA, 'wirte_fasta.fa')
         FASTA(outfile).write_handler(sequences)
+
+    @data(
+        ['dna.fa', '1'],
+    )
+    @unpack
+    def test_fasta_to_dict(self, input, expect_id):
+        infile = os.path.join(DIR_DATA, input)
+        res = FASTA(infile).fasta_to_dict()
+        print(res)
+        assert expect_id in res

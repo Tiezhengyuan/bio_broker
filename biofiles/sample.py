@@ -5,7 +5,8 @@ from biofiles.fastq import FASTQ
 from utils.file import File
 
 class Sample:
-    def read_sample_file(self):
+
+    def read_sample_file(self, infile:str):
         '''
         Read the sample file
         '''
