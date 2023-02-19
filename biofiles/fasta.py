@@ -3,9 +3,41 @@
 """
 import os
 import re
-
+from typing import Iterable
+from Bio import SeqIO, Seq, SeqRecord
+import gzip
 
 class FASTA:
+    def __init__(self, fa_file):
+        self.fa_file = fa_file
+
+
+    def read_handler(self)->Iterable:
+        '''
+        read sequence one by one
+        file format: .fasta/.fa or .fasta.gz/.fa.gz
+        '''
+        if os.path.exists(self.fa_file):
+            if self.fa_file.endswith('fasta') or self.fa_file.endswith('fa'):
+                with open(self.fa_file, 'r') as f:
+                    for seq in SeqIO.parse(f, "fasta"):
+                        yield seq
+            elif self.fa_file.endswith('fasta.gz') or self.fa_file.endswith('fa.gz'):
+                with gzip.open(self.fa_file, 'rt') as f:
+                    for seq in SeqIO.parse(f, "fasta"):
+                        yield seq
+        else:
+            print('warning: no such file', self.fa_file)
+
+    def write_handler(self, sequences:Iterable):
+        '''
+        write instance of SeqRecord to fasta.
+        '''
+        try:
+            with open(self.fa_file, 'w') as f:
+                SeqIO.write(sequences, f, "fasta")
+        except Exception as e:
+            print(e)
 
     @staticmethod
     def read_fa(self, fa_file):

@@ -1,7 +1,7 @@
 
 import requests
 import json
-
+import os
 
 class HTTP:
     def __init__(self, endpoint:str):
@@ -26,3 +26,18 @@ class HTTP:
         except Exception as e:
             pass
         return {}
+    
+    def download_file(self, outdir, path=None):
+        '''
+        Download file from HTTP web 
+        '''
+        url = f"{self.endpoint}{path}" if path else self.endpoint
+        outfile = os.path.join(outdir, os.path.basename(path))
+        try:
+            with open(outfile, 'wb') as f:
+                res = requests.get(url)
+                f.write(res.content)
+            return outfile
+        except Exception as e:
+            print(e)
+        return False
