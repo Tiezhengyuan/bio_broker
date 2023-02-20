@@ -1,6 +1,6 @@
 import multiprocessing as mp   # multi process
 import multiprocessing.dummy as mpd #multi-threading
-
+import subprocess
 
 class Threading:
     def __init__(self, args=None):
@@ -41,9 +41,12 @@ class Threading:
 
 
     @staticmethod
-    def run_tool(self,command):
+    def run_tool(command):
         print("@@@@@@@@@@@@", command)
         output="NA"
-        output=subprocess.Popen(command, stdout=subprocess.PIPE, shell=True).stdout.read()  
-        #        
+        output=subprocess.Popen(command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            shell=True).stdout.read()  
+        print(output)
         return output

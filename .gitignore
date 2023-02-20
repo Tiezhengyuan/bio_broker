@@ -1,7 +1,4 @@
 cache
 download
-connector/__pycache__
-ontology/__pycache__
-database/__pycache__
-tests/unittests/__pycache__
-tests/localtests/__pycache__
+*/__pycache__
+tests/*/__pycache__

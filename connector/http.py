@@ -4,17 +4,18 @@ import json
 import os
 
 class HTTP:
-    def __init__(self, endpoint:str):
+    def __init__(self, endpoint:str=None):
         self.endpoint = endpoint
     
     def retrieve_data(self, path=None, parameters=None):
         url = f"{self.endpoint}{path}" if path else self.endpoint
-        # print(url)
         if parameters:
             par = '&'.join([ f"{k}={v}" for k,v in parameters.items()])
             url += f"?{par}"
-
-        res = requests.get(url)
+        # print(url)
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+        res = requests.get(url, headers=headers)
+        # print(res)
         if res.status_code == 200:
             return res.text
         return None
@@ -41,3 +42,15 @@ class HTTP:
         except Exception as e:
             print(e)
         return False
+
+    def download_pdf(self, pdf_url, local_path, headers=None):
+        headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36'}
+        res = requests.get(pdf_url, headers=headers, allow_redirects=True)
+        try:
+            with open(local_path, 'wb') as f:
+                f.write(res.content)
+        except Exception as e:
+            print(e)
+        return False
+
+
