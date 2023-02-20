@@ -72,3 +72,4 @@ Gene Ontology: http://geneontology.org/docs/ontology-documentation/
 API of GO: http://api.geneontology.org/api
 Disease Ontology: https://www.disease-ontology.org/
 Ontology Looup Service (OLS): https://www.ebi.ac.uk/ols/index/
+NCBI-Entrez:  https://eutils.ncbi.nlm.nih.gov

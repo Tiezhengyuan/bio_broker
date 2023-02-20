@@ -3,21 +3,27 @@ PubMed: https://pubmed.ncbi.nlm.nih.gov/
 """
 import os, sys
 from bs4 import BeautifulSoup
-import wget
+from Bio import Entrez
 
 from connector.http import HTTP
 from utils.threading import Threading
+from database.myentrez import myEntrez
 
-class PubMed:
+class PubMed(myEntrez):
+    db = 'pubmed'
+
     def __init__(self):
+        super(PubMed, self).__init__()
         self.endpoint = 'https://eutils.ncbi.nlm.nih.gov/entrez/'
-        self.dir_download = os.environ.get('DIR_DOWNLOAD')
-        self.dir_bin = os.environ.get('DIR_BIN')
         self.ref = {}
-    
+
+    def get_ref(self):
+        return self.ref
+
     def process(self, pmid:str):
         '''
         download article in PDF format
+        pmid is parsing medline records
         '''
         par = {
             'dbfrom': 'pubmed',
@@ -57,5 +63,8 @@ class PubMed:
         self.ref['pdf_links'] = links
         return links
             
-
-
+    def search_pubmed(self, term:str, **kwargs):
+        '''
+        retrieve 20 pmids per time
+        '''
+        return self.search_entrez(self.db, term, **kwargs)

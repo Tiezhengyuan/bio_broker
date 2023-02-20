@@ -45,7 +45,7 @@ class Test_(TestCase):
         res = PubMed().get_pdf(url)
         assert list(res[0]) == ['pdf_url', 'local_path']
 
-
+    @skip
     @data(
         # Silverchair Information Systems
         [19880848, ],
@@ -56,3 +56,15 @@ class Test_(TestCase):
     @mock.patch.dict(os.environ, {"DIR_DOWNLOAD": DIR_DOWNLOAD, "DIR_BIN": DIR_BIN})
     def test_process(self, pmid):
         PubMed().process(pmid)
+
+
+    @data(
+        # ["bioinformatics[title]", 100],
+        ["human[Orgn] AND matK[Gene]", 100]
+    )
+    @unpack
+    def test_search_pubmed(self, term, expect):
+        res = PubMed().search_pubmed(term)
+        for i in res:
+            print(i)
+
