@@ -29,7 +29,7 @@ class myEntrez:
             db_infos[db] = db_info
         return db_infos
 
-    def search_entrez(self, db:str, term:str, **kwargs):
+    def search_entrez(self, db:str, term:str, idtype:str):
         '''
         retrieve 20 ids per time
         '''
@@ -38,10 +38,25 @@ class myEntrez:
             handle = Entrez.esearch(
                 db=db,
                 term = term,
-                RetStart=ret_start
+                RetStart=ret_start,
+                idtype=idtype
             )
             record = Entrez.read(handle)
             ret_start += 20
             if int(record['Count']) < ret_start:
                 ret_start = None
             yield record['IdList']
+
+
+    def retrieve_record(self, db:str, id:str, rettype:str, retmode:str):
+        try:
+            handle = Entrez.efetch(
+                db=db,
+                id=id,
+                rettype=rettype,
+                retmode=retmode
+            )
+            # return instance of Record class
+            return handle.read()
+        except Exception as e:
+            print('failed retrieve record from Entrez', e)

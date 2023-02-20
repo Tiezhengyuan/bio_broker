@@ -54,7 +54,8 @@ class PubMed(myEntrez):
         for i in soup.find_all('meta',attrs={'name':'citation_pdf_url'}):
             # print(i['content'])
             file_name = os.path.basename(i['content'])
-            local_file = os.path.join(self.dir_download, f"{self.ref.get('pmid', '')}_{file_name}")
+            local_file = os.path.join(self.dir_download, \
+                f"{self.ref.get('pmid', '')}_{file_name}")
             HTTP().download_pdf(i['content'], local_file)
             links.append({
                 'pdf_url': i['content'],
@@ -67,4 +68,9 @@ class PubMed(myEntrez):
         '''
         retrieve 20 pmids per time
         '''
-        return self.search_entrez(self.db, term, **kwargs)
+        idtype = kwargs['idtype'] if 'idtype' in kwargs else 'pmid'
+        return self.search_entrez(
+            db=self.db,
+            term=term,
+            idtype=idtype
+        )

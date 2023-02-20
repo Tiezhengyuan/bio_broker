@@ -60,11 +60,12 @@ class Test_(TestCase):
 
     @data(
         # ["bioinformatics[title]", 100],
-        ["human[Orgn] AND matK[Gene]", 100]
+        # ["human[Orgn] AND matK[Gene]", 100],
+        ['Bioinformatics[journal] AND 2023/02[mindate]', 100]
     )
     @unpack
     def test_search_pubmed(self, term, expect):
-        res = PubMed().search_pubmed(term)
+        res = PubMed().search_pubmed(term, idtype='pmid')
         for i in res:
             print(i)
 
