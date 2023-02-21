@@ -29,7 +29,7 @@ class myEntrez:
             db_infos[db] = db_info
         return db_infos
 
-    def search_entrez(self, db:str, term:str, idtype:str):
+    def search_entrez(self, db:str, term:str, idtype:str=None):
         '''
         retrieve 20 ids per time
         '''
@@ -48,7 +48,8 @@ class myEntrez:
             yield record['IdList']
 
 
-    def retrieve_record(self, db:str, id:str, rettype:str, retmode:str):
+    def retrieve_record(self, db:str, id:str, \
+            rettype:str=None, retmode:str=None):
         try:
             handle = Entrez.efetch(
                 db=db,
