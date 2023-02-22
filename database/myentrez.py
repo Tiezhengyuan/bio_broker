@@ -2,7 +2,7 @@
 Entrez: https://eutils.ncbi.nlm.nih.gov
 """
 from datetime import datetime
-import os, sys
+import os, sys, time
 from bs4 import BeautifulSoup
 import wget
 from Bio import Entrez
@@ -32,20 +32,32 @@ class myEntrez:
     def search_entrez(self, db:str, term:str, idtype:str=None):
         '''
         retrieve 20 ids per time
+        example: https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&term=asthma
         '''
         ret_start = 0
+        try_times = 1
         while ret_start is not None:
-            handle = Entrez.esearch(
-                db=db,
-                term = term,
-                RetStart=ret_start,
-                idtype=idtype
-            )
-            record = Entrez.read(handle)
-            ret_start += 20
-            if int(record['Count']) < ret_start:
-                ret_start = None
-            yield record['IdList']
+            if try_times == 3:
+                print("Error: HTTP connection failed. Trying 3 times")
+                break
+            try:
+                handle = Entrez.esearch(
+                    db=db,
+                    term = term,
+                    RetStart=ret_start,
+                    idtype=idtype
+                )
+                record = Entrez.read(handle)
+                ret_start += 20
+                if int(record['Count']) < ret_start:
+                    ret_start = None
+                print(record['IdList'])
+                try_times = 1
+                yield record['IdList']
+            except Exception as e:
+                print(e)
+                try_times +=1
+                time.sleep(5)
 
 
     def efetch(self, db:str, id:str, rettype:str=None,\

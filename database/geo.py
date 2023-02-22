@@ -5,10 +5,12 @@ high-throughput gene expression and hybridization array data.
 import os, sys, re
 from bs4 import BeautifulSoup
 from Bio import Entrez, Geo
+import pandas as pd
 
 from connector.http import HTTP
 from connector.connect_ftp import ConnectFTP
 from utils.threading import Threading
+from utils.file import File
 from database.myentrez import myEntrez
 
 class GEO(myEntrez):
@@ -107,4 +109,45 @@ class GEO(myEntrez):
         ftp_path = ftp_url.replace(self.ftp_endpoint, '')
         ConnectFTP(self.ftp_endpoint).download_tree(
             GSE, ftp_path, None)
+
+
+    def read_data(self, GSE:str):
+        matrix_path = os.path.join(self.dir_download, GSE, 'matrix', \
+            f"{GSE}_series_matrix.txt.gz")
+        metadata, data = {}, {}
+        with File(matrix_path).readonly_handle() as f:
+            for line in f:
+                line = line.rstrip()
+                if line.startswith('!'):
+                    line = line.replace("\"", "").rstrip()
+                    items = line[1:].split('\t')
+                    # print(items)
+                    if len(items) == 2:
+                        if 'Series_sample_id' == items[0]:
+                            # print(repr(line))
+                            data[items[0]] = items[1].split(' ')
+                        else:
+                            metadata[items[0]] = items[1]
+                    elif len(items) > 2:
+                        data[items[0]] = items[1:]
+        #convert data to data frame
+        d = pd.DataFrame.from_dict(data, orient='index')
+        d.columns = data['Sample_title']
+        # print(d)
+        # print(metadata)
+
+        # read suppl_counts
+        counts = None
+        if 'Series_supplementary_file' in metadata:
+            filename = os.path.basename(metadata['Series_supplementary_file'])
+            local_path = os.path.join(self.dir_download, GSE, 'suppl', filename)
+            print(local_path)
+            counts = pd.read_csv(local_path, sep=',', header=0, index_col=0)
+            # print(counts)
+            # print(counts.shape)
+        return  metadata, data, counts
+
+    # def read_suppl_counts(self, filename):
+        # for k,v in data.items():
+        #     print(k, len(v), v)
 

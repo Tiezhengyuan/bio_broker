@@ -21,10 +21,11 @@ class Test_(TestCase):
         pass
 
 
-    @skip
+    # @skip
     @data(
-        ["GSE16[acc]", 27],
+        # ["GSE16[acc]", 27],
         # ["GSE152641[acc]", None],
+        ["covid-19[title]", 27],
     )
     @unpack
     def test_retrieve_uids(self, GSE, samples):
@@ -41,6 +42,7 @@ class Test_(TestCase):
         res = GEO().retrieve_summary(id_list)
         print(res)
 
+    @skip
     @data(
        ["GSE152641",],
     )
@@ -49,3 +51,11 @@ class Test_(TestCase):
     def test_download_data(self, GSE):
         res = GEO().download_data(GSE)
 
+    @skip
+    @data(
+       ["GSE152641",],
+    )
+    @unpack
+    @mock.patch.dict(os.environ, {'DIR_DOWNLOAD': DIR_DOWNLOAD})
+    def test_read_data(self, GSE):
+        metadata, data, counts = GEO().read_data(GSE)

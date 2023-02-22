@@ -1,5 +1,6 @@
 import os, sys
 import re
+import gzip
 
 class File:
     def __init__(self, infile):
@@ -9,7 +10,7 @@ class File:
         '''
         ouput is read-only file handle
         '''
-        if infile.endswith('.gz'):
+        if self.infile.endswith('.gz'):
             in_obj = gzip.open(self.infile, 'rt')
         else:
             in_obj = open(self.infile, 'rt')
