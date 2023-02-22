@@ -58,6 +58,7 @@ class Test_(TestCase):
         PubMed().process(pmid)
 
 
+    @skip
     @data(
         # ["bioinformatics[title]", 100],
         # ["human[Orgn] AND matK[Gene]", 100],
@@ -69,3 +70,13 @@ class Test_(TestCase):
         for i in res:
             print(i)
 
+    @skip
+    @data(
+        ["14630660", 94],
+        # wrong pmid
+        ["0000", 0],
+    )
+    @unpack
+    def test_search_citations(self, pmid, expect):
+        res = PubMed().search_citations(pmid)
+        assert len(res) >= expect

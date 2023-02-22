@@ -23,8 +23,8 @@ class FASTA:
                         yield seq
             elif self.fa_file.endswith('fasta.gz') or self.fa_file.endswith('fa.gz'):
                 with gzip.open(self.fa_file, 'rt') as f:
-                    for seq in SeqIO.parse(f, "fasta"):
-                        yield seq
+                    for seq_record in SeqIO.parse(f, "fasta"):
+                        yield seq_record
         else:
             print('warning: no such file', self.fa_file)
 

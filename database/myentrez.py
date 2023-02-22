@@ -48,8 +48,8 @@ class myEntrez:
             yield record['IdList']
 
 
-    def retrieve_record(self, db:str, id:str, \
-            rettype:str=None, retmode:str=None):
+    def efetch(self, db:str, id:str, rettype:str=None,\
+            retmode:str=None):
         try:
             handle = Entrez.efetch(
                 db=db,
@@ -61,3 +61,12 @@ class myEntrez:
             return handle.read()
         except Exception as e:
             print('failed retrieve record from Entrez', e)
+
+    def fetch_elink(self, dbfrom:str, db:str, link_name:str, id:str):
+        handle = Entrez.elink(
+            dbfrom=dbfrom,
+            db=db,
+            LinkName=link_name,
+            id=id
+        )
+        return Entrez.read(handle)

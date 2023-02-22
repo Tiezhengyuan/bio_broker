@@ -20,8 +20,8 @@ class DNA(Seq):
                 return False
         return True
     
-    # def locate_subseq(self, sub_str:str):
-    #     '''
-    #     index 0-...
-    #     '''
-    #     return self.seq.find(sub_str)
+    def locate_subseq(self, sub_str:str):
+        '''
+        index 0-...
+        '''
+        return self.seq.find(sub_str)

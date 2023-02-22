@@ -23,20 +23,29 @@ class Test_(TestCase):
 
     @skip
     @data(
-        ["GSE16", None],
+        ["GSE16[acc]", 27],
+        # ["GSE152641[acc]", None],
     )
     @unpack
-    def test_search_geo(self, term, idtype):
-        res = GEO().search_geo(term, idtype=idtype)
-        for i in res:
-            print(i)
+    def test_retrieve_uids(self, GSE, samples):
+        res = GEO().retrieve_uids(GSE)
+        print(res, len(res))
 
-    @skip
+    @skip 
     @data(
-        [['200000016',],],
-        [['100000028', ],],
-        [['200003341',],]
+        # [['200000016',],],
+        [['100000028', '200000016','300000794','300000795',],],
     )
     @unpack
-    def test_retrieve_records(self, id_list):
-        res = GEO().retrieve_records(id_list)
+    def test_retrieve_summary(self, id_list):
+        res = GEO().retrieve_summary(id_list)
+        print(res)
+
+    @data(
+       ["GSE152641",],
+    )
+    @unpack
+    @mock.patch.dict(os.environ, {'DIR_DOWNLOAD': DIR_DOWNLOAD})
+    def test_download_data(self, GSE):
+        res = GEO().download_data(GSE)
+

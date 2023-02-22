@@ -74,3 +74,18 @@ class PubMed(myEntrez):
             term=term,
             idtype=idtype
         )
+    
+    def search_citations(self, pmid:str):
+        '''
+        search citations
+        '''
+        res= self.fetch_elink(
+            dbfrom=self.db,
+            db="pmc",
+            link_name="pubmed_pmc_refs",
+            id=pmid
+        )[0]
+        if res['ERROR'] == [] and len(res['LinkSetDb']) > 0:
+            pmc_ids = [link["Id"] for link in res["LinkSetDb"][0]["Link"]]
+            return pmc_ids
+        return []
