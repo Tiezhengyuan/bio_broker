@@ -10,16 +10,6 @@ import json
 class Utils:
 
     @staticmethod
-    def print_dict(self, indict):
-        '''
-        print dictionary to stdout for debugging
-        '''
-        n = 1
-        for key in sorted(indict.keys()):
-            print('{:5}: {:10}\t{}'.format(n, key, indict[key]))
-            n += 1
-
-    @staticmethod
     def sort_array(arr):
         '''
         element: characters+numerics
@@ -42,6 +32,21 @@ class Utils:
                         arr[j], arr[j-1] = arr[j-1], arr[j]
         return arr
     
+    @staticmethod
+    def init_dict(input:dict, keys:list, default_val=None):
+        '''
+        arg: default_val = '', [], {}
+        '''
+        curr = input
+        if isinstance(, dict):
+            for k in keys[:-1]:
+                if k not in curr:
+                    curr[k] = {}
+                curr = curr[k]
+            if keys[-1] not in curr:
+                curr[keys[-1]] = default_val if \
+                    default_val is not None else ''
+
 
 
 

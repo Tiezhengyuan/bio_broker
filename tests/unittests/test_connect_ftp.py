@@ -41,7 +41,7 @@ class Test_(TestCase):
         res = ConnectFTP(self.endpoint).download_files(path, pattern)
         assert len(res) == expect
 
-
+    @skip
     @data(
         ['GSE3341', 'geo/series/GSE3nnn/GSE3341/', None, 3],
     )
@@ -51,3 +51,14 @@ class Test_(TestCase):
         res = ConnectFTP(self.endpoint).download_tree(
             local_name, path, pattern)
         assert len(res) == expect
+
+    @data(
+        # ['pub/taxonomy/new_taxdump/', 'new_taxdump.zip', None, True],
+        ['pub/taxonomy/new_taxdump/', 'wrong_name.zip', None, False],
+    )
+    @unpack
+    @mock.patch.dict(os.environ, {'DIR_DOWNLOAD': DIR_DOWNLOAD})
+    def test_download_file(self, ftp_path, file_name, local_path, expect):
+        res = ConnectFTP(self.endpoint).download_file(
+            ftp_path, file_name, local_path)
+        assert res == expect

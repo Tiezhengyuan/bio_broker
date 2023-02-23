@@ -11,12 +11,14 @@ Entrez.email = "tiezhengyuan@hotmail.com"
 
 from connector.http import HTTP
 from utils.threading import Threading
+from utils.commons import Commons
 
-class myEntrez:
+
+class myEntrez(Commons):
     def __init__(self):
+        super(myEntrez, self).__init__()
         # self.endpoint = 'https://eutils.ncbi.nlm.nih.gov/entrez/'
-        self.dir_download = os.environ.get('DIR_DOWNLOAD', '')
-        self.dir_bin = os.environ.get('DIR_BIN', '')
+
     
     def get_db_infos(self):
         db_infos = {}
@@ -82,3 +84,4 @@ class myEntrez:
             id=id
         )
         return Entrez.read(handle)
+    

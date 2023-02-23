@@ -1,6 +1,7 @@
 import os, sys
 import re
 import gzip
+import json
 
 class File:
     def __init__(self, infile):
@@ -15,6 +16,42 @@ class File:
         else:
             in_obj = open(self.infile, 'rt')
         return in_obj
+
+    def read_slice(self, rows:int=None, skip:int=None):
+        '''
+        read file and return some rows in a block
+        '''
+        if rows is None: rows = 100
+        if skip is None: skip = 0
+        in_obj = gzip.open(self.infile, 'rt') if self.infile.endswith('.gz') \
+            else open(self.infile, 'rt')
+        with in_obj as f:
+            block = []
+            # skip some top rows
+            for i in range(skip):
+                next(f)
+            for line in f:
+                line = line.rstrip()
+                block.append(line)
+                if len(block) == rows:
+                    yield block
+                    block = []
+            if block:
+                yield block            
+
+    def read_top_lines(self, rows:int=None):
+        '''
+        read file and return some rows in a block
+        '''
+        if rows is None: rows = 1
+        in_obj = gzip.open(self.infile, 'rt') if self.infile.endswith('.gz') \
+            else open(self.infile, 'rt')
+        with in_obj as f:
+            lines = []
+            for i in range(rows):
+                line = next(f)
+                lines.append(line.rstrip())
+            return lines
 
 
     def list_to_file(self, inlist, out_file):
@@ -55,3 +92,32 @@ class File:
                     items=line.split(pattern)
                     outdirct[items[0]]=items[1]
         return outdirct
+
+
+    def update_json(self, input_dict:dict):
+        new = {}
+        if os.path.isfile(self.infile):
+            try:
+                with open(self.infile, 'r') as f:
+                    origin = json.load(f)
+                    new.update(origin)
+            except Exception as e:
+                print(e)
+        new.update(input_dict)
+        with open(self.infile, 'w') as f:
+            json.dump(new, f, indent=4, sort_keys=True)
+            print(f"{self.infile} is updated.")
+
+    def save_json(self, input:dict):
+        with open(self.infile, 'w') as f:
+            json.dump(input, f, indent=4, sort_keys=True)
+            print(f"{self.infile} is updated.")
+    
+    def read_dump_file(self):
+        '''
+        *.dmp is exported from Oracle database
+        '''
+        with open(self.infile, 'r') as f:
+            for line in f:
+                items = re.split(r'\t*\|\t*', line.rstrip())
+                yield items

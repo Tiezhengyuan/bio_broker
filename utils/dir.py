@@ -6,6 +6,27 @@ class Dir:
     def __init__(self, indir):
         self.indir = indir
 
+    def init_dir(self):
+        '''
+        create the directory if that doesn't exists
+        '''
+        pool = [self.indir,]
+        while pool:
+            curr_dir = pool.pop(0)
+            if not os.path.isdir(curr_dir):
+                parent_dir = os.path.dirname(curr_dir)
+                if os.path.isdir(parent_dir):
+                    try:
+                        os.mkdir(curr_dir, 0o777)
+                    except Exception as e:
+                        print(e)
+                        return False
+                else:
+                    pool = [parent_dir, curr_dir] + pool
+        return True
+
+
+
     def format_dir(self):
         '''
         format directory
