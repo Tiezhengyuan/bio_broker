@@ -38,7 +38,7 @@ class Utils:
         arg: default_val = '', [], {}
         '''
         curr = input
-        if isinstance(, dict):
+        if isinstance(input, dict):
             for k in keys[:-1]:
                 if k not in curr:
                     curr[k] = {}

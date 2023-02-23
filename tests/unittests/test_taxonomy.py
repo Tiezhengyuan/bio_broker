@@ -8,8 +8,8 @@ import os, sys
 from database.taxonomy import Taxonomy
 
 env = {
-    'DIR_CACHE': "F:\\bio_broker\\cache",
-    'DIR_DOWNLOAD': "F:\\bio_broker\\download",
+    'DIR_CACHE': "H:\\cache",
+    'DIR_DOWNLOAD': "H:\\download",
 }
 
 @ddt

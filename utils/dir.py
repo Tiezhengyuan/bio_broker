@@ -25,8 +25,6 @@ class Dir:
                     pool = [parent_dir, curr_dir] + pool
         return True
 
-
-
     def format_dir(self):
         '''
         format directory
@@ -48,6 +46,7 @@ class Dir:
         if not os.path.isdir(self.indir):
             os.mkdir(self.indir, 0o777)
         return self.indir
+
 
     def recrusive_files(self): 
         '''
@@ -84,3 +83,14 @@ class Dir:
         R1_files=list(set(raw_files)-set(R2_files))
         #print(R2_files)
         return R1_files, R2_files, raw_files
+
+    @staticmethod
+    def cascade_dir(parent_dir:str, id_str:str, num:int):
+        '''
+        restrict numbers of files or subdirectory for tuning up
+        '''
+        if len(id_str) < num:
+            return parent_dir
+        next_dir = os.path.join(parent_dir, id_str[:num])
+        return Dir.cascade_dir(next_dir, id_str[num:], num)
+        

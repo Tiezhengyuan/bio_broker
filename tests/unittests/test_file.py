@@ -7,8 +7,8 @@ import os, sys
 
 from utils.file import File
 
-DIR_CACHE = "F:\\bio_broker\\cache"
-DIR_DOWNLOAD = "F:\\bio_broker\\download"
+DIR_CACHE = "H:\\cache"
+DIR_DOWNLOAD = "H:\\download"
 
 dir_data = os.path.dirname(os.path.dirname(__file__))
 
