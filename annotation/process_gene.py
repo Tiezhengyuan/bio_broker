@@ -28,10 +28,11 @@ class ProcessGene(Commons):
             self.map_tarxonomy_gene(file_name, tax_id)
         self.parse_orthologs(tax_id)
         self.parse_neighbors(tax_id)
-
+        self.parse_info(tax_id)
+        self.parse_history(tax_id)
+        self.parse_group(tax_id)
         #integrate into gene2accesssion.json
         self.parse_uniprotkb(tax_id)
-
 
     def gene_to_accession(self, tax_id:str=None):
         '''
@@ -42,7 +43,6 @@ class ProcessGene(Commons):
             self.map_gene('gene2accession')
         else:
             self.map_tarxonomy_gene('gene2accession', tax_id)
-
 
     def gene_to_refseq(self, tax_id:str=None):
         '''
@@ -140,7 +140,6 @@ class ProcessGene(Commons):
             Dir(outdir).init_dir()
             outfile = os.path.join(outdir, f"{tax_id}_{file_name}.json")
             File(outfile).save_json(map)
-
                            
     def parse_uniprotkb(self, tax_id:str):
         '''
@@ -176,45 +175,58 @@ class ProcessGene(Commons):
         # save updated data
         File(infile).save_json(data)
 
-    def parse_orthologs(self, tax_id):      
+    def parse_(self, tax_id:str, name:str):
         '''
-        parse orthology bewteen geneids
-        source file: gene_orthologs.gz
-        '''
-        map = {}
-        mapfile = os.path.join(self.dir_source, "gene_orthologs.gz")
-        with File(mapfile).readonly_handle() as f:
-            col_names = next(f).strip().split('\t')
-            for line in f:
-                items = line.rstrip().split('\t')
-                if tax_id == items[0]:
-                    rec = {k:v for k,v in zip(col_names[2:], items[2:])}
-                    Utils.update_dict(map, items[1], rec) 
-
-        # save updated data
-        outdir = Dir.cascade_dir(self.dir_map, tax_id, self.cascade_num)
-        outfile = os.path.join(outdir, f"{tax_id}_gene_orthologs.json")
-        File(outfile).save_json(map)
-
-
-    def parse_neighbors(self, tax_id):      
-        '''
-        parse geneid with chromsome locus
-        source file: gene_neighbors.gz
+        parse geneid ~ other info
+        source file: gene_*.gz
         '''
         map = {}
-        mapfile = os.path.join(self.dir_source, "gene_neighbors.gz")
+        mapfile = os.path.join(self.dir_source, f"{name}.gz")
         with File(mapfile).readonly_handle() as f:
             col_names = next(f).strip().split('\t')
             for line in f:
                 items = line.rstrip().split('\t')
                 if tax_id == items[0]:
                     rec = {}
-                    for k,v in zip(col_names[2:], items[2:]):
+                    for k,v in zip(col_names, items):
                         rec[k] = v.split('|') if '|' in v else v
                     Utils.update_dict(map, items[1], rec) 
-
         # save updated data
         outdir = Dir.cascade_dir(self.dir_map, tax_id, self.cascade_num)
-        outfile = os.path.join(outdir, f"{tax_id}_gene_neighbors.json")
+        outfile = os.path.join(outdir, f"{tax_id}_{name}.json")
         File(outfile).save_json(map)
+
+    def parse_neighbors(self, tax_id:str):      
+        '''
+        parse geneid with chromsome locus
+        source file: gene_neighbors.gz
+        '''
+        self.parse_(tax_id, 'gene_neighbors')
+
+    def parse_orthologs(self, tax_id:str):      
+        '''
+        parse orthology bewteen geneids
+        source file: gene_orthologs.gz
+        '''
+        self.parse_(tax_id, 'gene_orthologs')
+
+    def parse_info(self, tax_id:str):
+        '''
+        parse geneid with gene info
+        source file: gene_info.gz
+        '''
+        self.parse_(tax_id, 'gene_info')
+
+    def parse_history(self, tax_id:str):
+        '''
+        parse geneid with gene history
+        source file: gene_history.gz
+        '''
+        self.parse_(tax_id, 'gene_history')
+
+    def parse_group(self, tax_id:str):
+        '''
+        parse geneid with gene group
+        source file: gene_group.gz
+        '''
+        self.parse_(tax_id, 'gene_group')

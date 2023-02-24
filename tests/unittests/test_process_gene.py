@@ -15,7 +15,8 @@ env = {
 
 @ddt
 class TestProcessGene(TestCase):
-
+    
+    @mock.patch.dict(os.environ, env)
     def setUp(self):
         self.c = ProcessGene()
 
@@ -51,13 +52,21 @@ class TestProcessGene(TestCase):
         self.c.parse_uniprotkb('9606')
 
     @skip
-    @mock.patch.dict(os.environ, env)
     def test_parse_orthologs(self):
         self.c.parse_orthologs('9606')
 
-    # @skip
-    @mock.patch.dict(os.environ, env)
+    @skip
     def test_parse_neighbors(self):
         self.c.parse_neighbors('9606')
 
 
+    @skip
+    def test_parse_history(self):
+        self.c.parse_history('9606')
+
+    @skip
+    def test_parse_group(self):
+        self.c.parse_group('9606')
+
+    def test_parse_info(self):
+        self.c.parse_info('9606')

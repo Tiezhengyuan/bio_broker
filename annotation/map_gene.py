@@ -56,10 +56,11 @@ class MapGene(Commons):
                 for term in terms:
                     if key1 in term and key2 in term:
                         k, v = term[key1], term[key2]
-                        if k != '-' and k not in map:
-                            map[k] = []
-                        if k in map and v not in map[k]:
-                            map[k].append(v)
+                        if isinstance(k, list):
+                            for sub in k:
+                                Utils.update_dict(map, sub, v)    
+                        else:
+                            Utils.update_dict(map, str(k), v)
         return map
 
     def geneid_to_symbol(self, tax_id:str):
@@ -67,3 +68,37 @@ class MapGene(Commons):
         geneid ~ gene symbols
         '''
         return self.get_map(f"{tax_id}_gene2accession.json", 'Symbol')
+
+    def geneid_to_chromosome(self, tax_id:str):
+        '''
+        geneid ~ chromosomes
+        '''
+        return self.get_map(f"{tax_id}_gene_info.json", 'chromosome')
+
+    def geneid_to_start_position(self, tax_id:str):
+        '''
+        geneid ~ start position on chromosome
+        '''
+        return self.get_map(f"{tax_id}_gene2accession.json", \
+                    'start_position_on_the_genomic_accession')
+
+    def ensembl_geneacc_to_geneid(self, tax_id:str):
+        '''
+        Ensembl accession ENSG... ~ geneid
+        '''
+        return self.get_intra_map(f"{tax_id}_gene2ensembl.json", \
+                        "Ensembl_gene_identifier", "GeneID")
+
+    def ensembl_proacc_to_geneid(self, tax_id:str):
+        '''
+        Ensembl protein accession ENSP... ~ geneid
+        '''
+        return self.get_intra_map(f"{tax_id}_gene2ensembl.json", \
+                        "Ensembl_protein_identifier", "GeneID")
+
+    def ensembl_rnaacc_to_geneid(self, tax_id:str):
+        '''
+        Ensembl transcript accession ENSP... ~ geneid
+        '''
+        return self.get_intra_map(f"{tax_id}_gene2ensembl.json", \
+                        "Ensembl_rna_identifier", "GeneID")
