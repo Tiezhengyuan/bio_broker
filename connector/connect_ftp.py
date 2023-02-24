@@ -63,7 +63,7 @@ class ConnectFTP:
                         with open(local_file, 'wb') as f:
                             self.ftp.retrbinary(f"RETR {file}", f.write)
                         local_files.append(local_file)
-                        print(f"Download data from {s elf.ftp.pwd()}.Local file: {local_file}")
+                        print(f"Download data from {self.ftp.pwd()} as {local_file}")
                     except Exception as e:
                         # print('Failure: download data from FTP', file)
                         pass
@@ -74,6 +74,7 @@ class ConnectFTP:
     def download_tree(self, local_name:str, ftp_path:str=None,\
             file_pattern:str=None):
         '''
+        arg: local_name is determined by os.path.join()
         Download FTP directory recursively
         '''
         #initialize local_path
@@ -91,13 +92,14 @@ class ConnectFTP:
             if _ftp_path:
                 self.ftp.cwd(_ftp_path)
             print(self.ftp.pwd(), self.ftp.nlst())
+            # check if name is directory
             for name in self.ftp.nlst():
                 if self.is_dir(name):
                     sub_ftp_path = f"{_ftp_path}/{name}"
                     sub_local_path = os.path.join(_local_path, name)
                     Dir(sub_local_path).init_dir()
                     pool.append((sub_ftp_path, sub_local_path))
-                else:
-                    local_files += self.download_files(
-                        None, file_pattern, _local_path)
+            #download files
+            local_files += self.download_files(
+                None, file_pattern, _local_path)
         return local_files

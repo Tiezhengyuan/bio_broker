@@ -16,6 +16,8 @@ class ConnectNCBI(ConnectFTP):
         download gene/DATA including subdirectories and files
         '''
         local_files = self.download_tree(
-            os.path.join('NCBI', 'gene', 'DATA'),
-            'gene/DATA', '.gz')
+            local_name = os.path.join('NCBI', 'gene', 'DATA'),
+            ftp_path = 'gene/DATA',
+            file_pattern = '.gz'
+        )
         return local_files

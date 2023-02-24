@@ -90,8 +90,8 @@ class File:
                 line = line.rstrip()
                 if not line.startswith('#'):
                     items=line.split(pattern)
-                    outdirct[items[0]]=items[1]
-        return outdirct
+                    outdict[items[0]]=items[1]
+        return outdict
 
 
     def update_json(self, input_dict:dict):
