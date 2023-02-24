@@ -17,19 +17,16 @@ env = {
 class TestMapGene(TestCase):
 
     def setUp(self):
-        pass
+        self.c = MapGene()
 
-    # @skip
-    @mock.patch.dict(os.environ, env)
-    def test_gene_to_acc(self):
-        MapGene().gene_to_acc()
 
     @skip
+    @data(
+        ['9606', "100008586", "GAGE12F"],
+    )
+    @unpack
     @mock.patch.dict(os.environ, env)
-    def test_gene_to_refseq(self):
-        MapGene().gene_to_refseq()
-
-    @skip
-    @mock.patch.dict(os.environ, env)
-    def test_gene_to_pubmed(self):
-        MapGene().gene_to_pubmed()
+    def test_geneid_to_symbol(self, tax_id, expect_uid, expect_symbol):
+        map, rev_map = self.c.geneid_to_symbol(tax_id)
+        assert expect_uid in map
+        assert expect_symbol in rev_map

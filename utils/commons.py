@@ -3,6 +3,8 @@ import os
 import xml.dom.minidom
 
 class Commons:
+    cascade_num = 2
+    
     def __init__(self):
         self.dir_download = os.environ.get('DIR_DOWNLOAD', '')
         self.dir_cache = os.environ.get('DIR_CACHE', '')

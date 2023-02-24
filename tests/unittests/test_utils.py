@@ -36,3 +36,19 @@ class Test_(TestCase):
     def test_init_dict(self, input, keys, default_val, expect):
         Utils.init_dict(input, keys, default_val)
         assert input == expect
+    
+    @data(
+        [{}, 'a', 1, {'a':[1,]}],
+        [{}, 'a', {'b':1}, {'a':[{'b':1},]}],
+        [{}, '', 1, {}],
+        [{}, '-', 1, {}],
+        [{}, None, 1, {}],
+        [{'a':[]}, 'a', 1, {'a':[1,]}],
+        [{'a':[1,]}, 'a', 1, {'a':[1,]}],
+        [{'a':[0,]}, 'a', 1, {'a':[0,1,]}],
+        [{'a':[1,]}, 'b', 2, {'a':[1,],'b':[2,]}],
+    )
+    @unpack
+    def test_update_dict(self, input, key, val, expect):
+        Utils.update_dict(input, key, val)
+        assert input == expect

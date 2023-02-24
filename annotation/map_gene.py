@@ -9,60 +9,61 @@ from utils.dir import Dir
 from utils.utils import Utils
 
 class MapGene(Commons):
+
     def __init__(self):
         super(MapGene, self).__init__()
         self.dir_map = os.path.join(self.dir_cache, 'map')
 
-    def gene_to_acc(self):
+    def get_map(self, file_name:str, target_term:str)->tuple:
         '''
-        Map Entrez Gene identifiers(uid) to GenBanck Accession Numbers
-        source file: gene2accession.gz
+        gene uid ~ <terms>
+        Note: local cache should exist
         '''
-        self.map_gene('gene2accession')
-
-    def gene_to_refseq(self):
-        '''
-        Map Entrez Gene identifiers(uid) to Accession Numbers of references
-        source file: gene2refseq.gz
-        '''
-        self.map_gene('gene2refseq')
-
-    def gene_to_pubmed(self):
-        '''
-        Map Entrez Gene identifiers(uid) to Accession Numbers of references
-        source file: gene2refseq.gz
-        '''
-        self.map_gene('gene2pubmed')
-
-
-    def map_gene(self, file_name:str):
-        '''
-        Map Entrez Gene identifiers(uid) to some identifiers
-        Note: local file should exist
-        source file is downloaded from FTP
-        '''
-        map, tax_id = {}, '',
-        # local file is downloaded from NCBI FTP
-        mapfile = os.path.join(self.dir_download, 'NCBI', \
-            'gene', 'DATA', f"{file_name}.gz")
-        # get column names
-        header = File(mapfile).read_top_lines()[0]
-        col_names = header.split('\t')
-        for lines in File(mapfile).read_slice(1e6, 1):
-            map = {}
-            for line in lines:
-                items = line.rstrip().split('\t')
-                tax_id, geneid = items[0], items[1]
-                Utils.init_dict(map, [tax_id, geneid], [])
-                map[tax_id][geneid].append(
-                    {k:v for k,v in zip(col_names, items)}
-                )
-                # print(map[tax_id][geneid])
-            # save map to cache
-            for tax_id in map:
-                outdir = Dir.cascade_dir(self.dir_map, tax_id, 2)
-                Dir(outdir).init_dir()
-                outfile = os.path.join(outdir, f"{tax_id}_{file_name}.json")
-                File(outfile).update_json(map[tax_id])
+        map, rev_map = {}, {}
+        tax_id = file_name.split('_', 2)[0]
+        indir = Dir.cascade_dir(self.dir_map, tax_id, self.cascade_num)
+        infile = os.path.join(indir, file_name)
+        with open(infile, 'r') as f:
+            data = json.load(f)
+            for uid, terms in data.items():
+                map[uid] = [] 
+                for term in terms:
+                    if term.get(target_term) not in (map[uid], '-', None):
+                        map[uid].append(term[target_term])
+                        break
+        # reverse mapping and remove duplicates
+        for term, vals in map.items():
+            for v in vals:
+                if v in rev_map:
+                    if uid not in rev_map[v]:
+                        rev_map[v].append(uid)
+                else:
+                    rev_map[v] = []
+        return (map, rev_map)
 
 
+    def get_intra_map(self, file_name:str, key1:str, key2:str)->dict:
+        '''
+        map key1~key2 within the uid list
+        '''
+        map = {}
+        tax_id = file_name.split('_', 2)[0]
+        indir = Dir.cascade_dir(self.dir_map, tax_id, self.cascade_num)
+        infile = os.path.join(indir, file_name)
+        with open(infile, 'r') as f:
+            data = json.load(f)
+            for terms in data.values():
+                for term in terms:
+                    if key1 in term and key2 in term:
+                        k, v = term[key1], term[key2]
+                        if k != '-' and k not in map:
+                            map[k] = []
+                        if k in map and v not in map[k]:
+                            map[k].append(v)
+        return map
+
+    def geneid_to_symbol(self, tax_id:str):
+        '''
+        geneid ~ gene symbols
+        '''
+        return self.get_map(f"{tax_id}_gene2accession.json", 'Symbol')

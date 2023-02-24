@@ -48,5 +48,13 @@ class Utils:
                     default_val is not None else ''
 
 
-
+    @staticmethod
+    def update_dict(input:dict, key, val):
+        if key not in ('', '-', None):
+            if key in input:
+                if isinstance(input[key], list) \
+                    and val not in input[key]:
+                    input[key].append(val)
+            else:
+                input[key] = [val,]
 
