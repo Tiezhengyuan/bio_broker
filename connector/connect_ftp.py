@@ -63,7 +63,7 @@ class ConnectFTP:
                         with open(local_file, 'wb') as f:
                             self.ftp.retrbinary(f"RETR {file}", f.write)
                         local_files.append(local_file)
-                        print(f"Download data from {self.ftp.pwd()} into {local_file}.")
+                        print(f"Download data from {s elf.ftp.pwd()}.Local file: {local_file}")
                     except Exception as e:
                         # print('Failure: download data from FTP', file)
                         pass
@@ -90,9 +90,10 @@ class ConnectFTP:
             _ftp_path, _local_path = pool.pop(0)
             if _ftp_path:
                 self.ftp.cwd(_ftp_path)
+            print(self.ftp.pwd(), self.ftp.nlst())
             for name in self.ftp.nlst():
                 if self.is_dir(name):
-                    sub_ftp_path = os.path.join(_ftp_path, name)
+                    sub_ftp_path = f"{_ftp_path}/{name}"
                     sub_local_path = os.path.join(_local_path, name)
                     Dir(sub_local_path).init_dir()
                     pool.append((sub_ftp_path, sub_local_path))
