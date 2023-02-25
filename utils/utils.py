@@ -5,7 +5,6 @@ from copy import deepcopy
 import gzip
 import os, sys
 import re
-import json
 
 class Utils:
 
@@ -85,4 +84,12 @@ class Utils:
                 for item in curr_input:
                     pool.append((curr_keys, item))
         return val
-
+    
+    @staticmethod
+    def merge_dict(d1:dict, d2:dict)->dict:
+        '''
+        values of corresponding keys between d1 and d2
+        should match to each other
+        '''
+        # d = deepcopy(d1)
+        pass

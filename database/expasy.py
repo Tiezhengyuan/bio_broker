@@ -1,7 +1,6 @@
 """
 ExPASy: https://www.expasy.org/
 """
-import json
 import os
 from typing import Iterable
 from Bio.ExPASy import Enzyme
@@ -9,6 +8,8 @@ from Bio.ExPASy import Enzyme
 from utils.commons import Commons
 from utils.file import File
 from utils.utils import Utils
+from utils.handle_json import HandleJson
+
 
 class ExPASy(Commons):
     db = 'expasy'
@@ -42,6 +43,9 @@ class ExPASy(Commons):
                 data[rec['ID']] = rec
         # save data
         File(self.cache_enzyme).save_json(data)
+        HandleJson(self.json_cache).update_json({
+            __name__: { f"{self.db}_enzyme": self.cache_enzyme}
+        })
         return self.cache_enzyme
     
     def gene_enzyme_annotation(self, ec:str)->dict:
@@ -49,7 +53,7 @@ class ExPASy(Commons):
         arg: ec is EC Number
         '''
         ec = ec.replace(' ', '').replace('EC', '')
-        enzyme = File(self.cache_enzyme).read_json()
+        enzyme = HandleJson(self.cache_enzyme).read_json()
         for id, rec in enzyme:
             if id == ec:
                 return rec
@@ -61,7 +65,7 @@ class ExPASy(Commons):
         '''
         if search_comments is None:
             search_comments = False
-        enzyme = File(self.cache_enzyme).read_json()
+        enzyme = HandleJson(self.cache_enzyme).read_json()
         for _, rec in enzyme:
             if term in rec['DE'] or (search_comments == \
                     True and term in rec['CC']):
@@ -72,11 +76,16 @@ class ExPASy(Commons):
         map UniProtKB ~ EC Number
         '''
         map = {}
-        enzyme = File(self.cache_enzyme).read_json()
+        enzyme = HandleJson(self.cache_enzyme).read_json()
         for id, rec in enzyme:
             for refs in rec.get('DR', []):
                 swissprot_id, _ = refs
                 Utils.update_dict(map, swissprot_id, id)
+        outfile = os.path.join(self.dir_cache, 'uniprotkb_to_ec.json')
+        HandleJson(outfile).save_json(map)
+        HandleJson(self.json_cache).update_json({
+            'map': {'UniProtKB accession': {"EC number": outfile}}
+        })
         return map
                         
 

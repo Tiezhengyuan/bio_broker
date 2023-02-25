@@ -11,6 +11,7 @@ from utils.commons import Commons
 from utils.file import File
 from utils.dir import Dir
 from utils.utils import Utils
+from utils.handle_json import HandleJson
 
 class Swissprot(Commons):
     db = 'swiss-prot'
@@ -23,14 +24,17 @@ class Swissprot(Commons):
 
     def process(self):
         metadata=(
-            (['accessions',], ['taxonomy_id',], 'accession_taxonomy'),
-            (['accessions',], ['sequence',], 'accession_sequence'),
-            (['accessions',], ['cross_reference','EMBL', 'accession'], 'accession_EMBLacc'),
-            (['accessions',], ['cross_reference','GO', 'id'], 'accession_GO'),
+            (['accessions',], ['taxonomy_id',], 'accession_taxonomy', "NCBI taxonomy"),
+            (['accessions',], ['sequence',], 'accession_sequence', "protein sequence"),
+            (['accessions',], ['cross_reference','EMBL', 'accession'], 'accession_EMBLacc', "EMBL-GenBank-DDBJ"),
+            (['accessions',], ['cross_reference','GO', 'id'], 'accession_GO', 'GO'),
         )
-        for key1, key2, filename in metadata:
+        for key1, key2, filename, key2 in metadata:
             outfile = os.path.join(self.cache_local, f"{filename}.json")
             self.map_term(key1, key2, outfile)
+            HandleJson(self.json_cache).update_json({
+                'map': {"UniProtKB accession": {key2: outfile}}
+            })
 
     def parse_protein(self)->Iterable:
         local_file = os.path.join(self.dir_local, 'uniprot_sprot.dat.gz')
@@ -90,22 +94,11 @@ class Swissprot(Commons):
         refs = {}
         if cross_references:
             for items in cross_references:
-                if items[0] not in refs:
-                    refs[items[0]] = []
-                if items[0] == 'EMBL':
-                    refs[items[0]].append({k:v for k,v in zip(['accession', \
-                        'protein_id', 'status', 'mo_type'], items[1:])})
-                elif items[0] == 'RefSeq':
-                    refs[items[0]].append({k:v for k,v in zip([\
-                        'accession', 'dna_accession',], items[1:])})
-                elif items[0] == 'SwissPalm':
-                    refs[items[0]].append({k:v for k,v in zip([\
-                        'accession', 'status',], items[1:])})
-                elif items[0] == 'GO':
-                    refs[items[0]].append({k:v for k,v in zip([\
-                        'id', 'name', 'type'], items[1:])})
-                else:
-                    refs[items[0]].append(list(items[1:]))
+                Utils.init_dict(refs, [items[0],], [])
+                refs[items[0]].append({
+                    'id': items[1],
+                    'other': list(items[2:]),
+                })
         return refs
 
     def map_term(self, key1:list, key2:list, outfile:str):

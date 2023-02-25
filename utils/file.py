@@ -53,11 +53,6 @@ class File:
                 lines.append(line.rstrip())
             return lines
 
-    def read_json(self):
-        with open(self.infile, 'r') as f:
-            data = json.load(f)
-            for k, v in data.items():
-                yield k, v
 
     def list_to_file(self, inlist, out_file):
         '''
@@ -99,24 +94,6 @@ class File:
         return outdict
 
 
-    def update_json(self, input_dict:dict):
-        new = {}
-        if os.path.isfile(self.infile):
-            try:
-                with open(self.infile, 'r') as f:
-                    origin = json.load(f)
-                    new.update(origin)
-            except Exception as e:
-                print(e)
-        new.update(input_dict)
-        with open(self.infile, 'w') as f:
-            json.dump(new, f, indent=4, sort_keys=True)
-            print(f"{self.infile} is updated.")
-
-    def save_json(self, input:dict):
-        with open(self.infile, 'w') as f:
-            json.dump(input, f, indent=4, sort_keys=True)
-            print(f"{self.infile} is updated.")
     
     def read_dump_file(self):
         '''

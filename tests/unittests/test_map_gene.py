@@ -81,3 +81,11 @@ class TestMapGene(TestCase):
     def test_ensembl_rnaacc_to_geneid(self, tax_id, acc, expect):
         map = self.c.ensembl_rnaacc_to_geneid(tax_id)
         assert map.get(acc) == expect
+
+    @data(
+        ['9606',],
+    )
+    @unpack
+    def test_process(self, tax_id):
+        self.c.process(tax_id)
+

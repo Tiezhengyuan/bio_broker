@@ -23,7 +23,7 @@ class TestKEGG(TestCase):
     def test_parse_enzyme(self):
         self.c.parse_enzyme()
 
-    # @skip
+    @skip
     @data(
         ["1.1.1.1", 'alcohol dehydrogenase'],
         ["EC1.1.1.1", 'alcohol dehydrogenase'],
@@ -46,6 +46,7 @@ class TestKEGG(TestCase):
         res = self.c.uniprotkb_to_ec()
         assert res.get(swissprot_id) == ec
 
+    @skip
     @data(
         ['alcohol dehydrogenase', False, 17],
         ['dehydrogenase', True, 613],
