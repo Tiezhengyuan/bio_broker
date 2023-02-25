@@ -17,7 +17,7 @@ class ExPASy(Commons):
         self.dir_local = os.path.join(self.dir_download, self.db)
         self.cache_enzyme = os.path.join(self.dir_cache, f"{self.db}_enzyme.json")
 
-    def parse_enzyme(self):
+    def parse_enzyme(self)->str:
         '''
         Process ~/expasy/enzyme/enzyme.dat
         Output: expasy_enzyme.json
@@ -42,17 +42,17 @@ class ExPASy(Commons):
                 data[rec['ID']] = rec
         # save data
         File(self.cache_enzyme).save_json(data)
+        return self.cache_enzyme
     
     def gene_enzyme_annotation(self, ec:str)->dict:
         '''
         arg: ec is EC Number
         '''
         ec = ec.replace(' ', '').replace('EC', '')
-        with open(self.cache_enzyme, 'r') as f:
-            enzyme = json.load(f)
-            for id, rec in enzyme.items():
-                if id == ec:
-                    return rec
+        enzyme = File(self.cache_enzyme).read_json()
+        for id, rec in enzyme:
+            if id == ec:
+                return rec
         return {}
 
     def search_enzymes(self, term:str, search_comments:bool=None)->Iterable:
@@ -61,24 +61,22 @@ class ExPASy(Commons):
         '''
         if search_comments is None:
             search_comments = False
-        with open(self.cache_enzyme, 'r') as f:
-            enzyme = json.load(f)
-            for _, rec in enzyme.items():
-                if term in rec['DE'] or (search_comments == \
-                        True and term in rec['CC']):
-                    yield rec
+        enzyme = File(self.cache_enzyme).read_json()
+        for _, rec in enzyme:
+            if term in rec['DE'] or (search_comments == \
+                    True and term in rec['CC']):
+                yield rec
 
     def uniprotkb_to_ec(self)->dict:
         '''
         map UniProtKB ~ EC Number
         '''
         map = {}
-        with open(self.cache_enzyme, 'r') as f:
-            enzyme = json.load(f)
-            for id, rec in enzyme.items():
-                for refs in rec.get('DR', []):
-                    swissprot_id, _ = refs
-                    Utils.update_dict(map, swissprot_id, id)
+        enzyme = File(self.cache_enzyme).read_json()
+        for id, rec in enzyme:
+            for refs in rec.get('DR', []):
+                swissprot_id, _ = refs
+                Utils.update_dict(map, swissprot_id, id)
         return map
                         
 

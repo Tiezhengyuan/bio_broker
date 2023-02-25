@@ -66,11 +66,17 @@ pytest tests/localtests
 ```
 
 # references
-## Ontology
+## Ontology database
 THE CANCER GENOME ATLAS (TCGA) PROJECT: https://docs.cancergenomicscloud.org/docs/tcga-data
 Gene Ontology: http://geneontology.org/docs/ontology-documentation/
 API of GO: http://api.geneontology.org/api
 Disease Ontology: https://www.disease-ontology.org/
 Ontology Looup Service (OLS): https://www.ebi.ac.uk/ols/index/
+
+## web database
 NCBI-Entrez:  https://eutils.ncbi.nlm.nih.gov
 ExPASy: https://www.expasy.org/
+UniProt: https://www.uniprot.org/
+
+## FTP
+ExPASy: ftp.expasy.org

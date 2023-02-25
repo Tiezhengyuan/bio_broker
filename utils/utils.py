@@ -1,7 +1,7 @@
 """
 
 """
-
+from copy import deepcopy
 import gzip
 import os, sys
 import re
@@ -57,4 +57,32 @@ class Utils:
                     input[key].append(val)
             else:
                 input[key] = [val,]
+
+    @staticmethod
+    def get_deep_value(input:dict, keys:list):
+        if not keys:
+            return []
+        val = []
+        pool = [(keys, input),]
+        while pool:
+            curr_keys, curr_input = pool.pop(0)
+            # print(curr_keys, curr_input)
+            if isinstance(curr_input, dict):
+                key = curr_keys[0]
+                if key in curr_input:
+                    if len(curr_keys) == 1:
+                        tmp = []
+                        if isinstance(curr_input[key], list):
+                            tmp += curr_input[key]
+                        else:
+                            tmp = [curr_input[key]]
+                        for t in tmp:
+                            if t not in val:
+                                val.append(t)
+                    else:
+                        pool.append((curr_keys[1:], curr_input[key]))
+            elif isinstance(curr_input, list):
+                for item in curr_input:
+                    pool.append((curr_keys, item))
+        return val
 

@@ -53,6 +53,11 @@ class File:
                 lines.append(line.rstrip())
             return lines
 
+    def read_json(self):
+        with open(self.infile, 'r') as f:
+            data = json.load(f)
+            for k, v in data.items():
+                yield k, v
 
     def list_to_file(self, inlist, out_file):
         '''

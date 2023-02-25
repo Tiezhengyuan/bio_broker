@@ -52,3 +52,18 @@ class Test_(TestCase):
     def test_update_dict(self, input, key, val, expect):
         Utils.update_dict(input, key, val)
         assert input == expect
+    
+    @data(
+        [{'a':3}, ['a'], [3]],
+        [{'a':{'b':{'c':3}}}, ['a', 'b', 'c'], [3]],
+        [{'a':{'b':{'c':{'d':[1,2]}}}}, ['a', 'b', 'c'], [{'d':[1,2]}]],
+        [[{'a':3},{'a':4}], ['a'], [3,4]],
+        [{'b':[{'a':3},{'a':4},{'c':5}]}, ['b','a'], [3,4]],
+        [{'b':[{'a':3},{'a':[4]},{'c':5}]}, ['b','a'], [3,4]],
+        [{'b':[{'a':3},{'a':4},{'c':5}]}, ['a','b'], []],
+        [{'b':[{'a':3},{'a':4},{'c':5}]}, [], []],
+    )
+    @unpack
+    def test_get_deep_value(self, input, keys, expect):
+        res = Utils.get_deep_value(input, keys)
+        assert res == expect

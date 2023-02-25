@@ -23,7 +23,7 @@ class TestKEGG(TestCase):
     def test_parse_enzyme(self):
         self.c.parse_enzyme()
 
-    @skip
+    # @skip
     @data(
         ["1.1.1.1", 'alcohol dehydrogenase'],
         ["EC1.1.1.1", 'alcohol dehydrogenase'],
@@ -35,7 +35,7 @@ class TestKEGG(TestCase):
         res = self.c.gene_enzyme_annotation(ec)
         assert res.get('name') == name
 
-    @skip
+    # @skip
     @data(
         ["P07327",  ["1.1.1.1"], ],
         ['Q9RR46', ['7.6.2.9'], ],
