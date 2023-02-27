@@ -76,7 +76,8 @@ class Utils:
                         else:
                             tmp = [curr_input[key]]
                         for t in tmp:
-                            if t not in val:
+                            if t not in val and t not \
+                                in (None, '', [], {}, '-'):
                                 val.append(t)
                     else:
                         pool.append((curr_keys[1:], curr_input[key]))

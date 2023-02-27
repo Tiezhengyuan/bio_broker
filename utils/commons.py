@@ -9,7 +9,9 @@ class Commons:
         # default directory
         self.dir_download = os.environ.get('DIR_DOWNLOAD', '')
         self.dir_cache = os.environ.get('DIR_CACHE', '')
+        self.dir_map = os.path.join(self.dir_cache, 'map')
         self.dir_bin = os.environ.get('DIR_BIN', '')
+
         # default file
         # format: {<class name>:{<method name>:<local path>}}
         self.json_cache = os.path.join(self.dir_cache, 'cache_local_path.json')

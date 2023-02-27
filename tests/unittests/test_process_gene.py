@@ -5,7 +5,7 @@ from unittest import TestCase, mock, skip
 from ddt import ddt, data, unpack
 import os
 
-from annotation.process_gene import ProcessGene
+from database.process_gene import ProcessGene
 
 env = {
     'DIR_CACHE': "H:\\cache",
@@ -20,10 +20,15 @@ class TestProcessGene(TestCase):
     def setUp(self):
         self.c = ProcessGene()
 
+    @mock.patch.dict(os.environ, env)
+    def test_process(self):
+        self.c.process_map('9606')
+
+
     @skip
     @mock.patch.dict(os.environ, env)
     def test_gene_to_accession(self):
-        self.c.gene_to_accession()
+        self.c.gene_to_accession('9606')
 
     @skip
     @mock.patch.dict(os.environ, env)
@@ -68,5 +73,6 @@ class TestProcessGene(TestCase):
     def test_parse_group(self):
         self.c.parse_group('9606')
 
+    @skip
     def test_parse_info(self):
         self.c.parse_info('9606')

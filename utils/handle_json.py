@@ -1,4 +1,6 @@
-
+"""
+Note: file size of JSON might be <200MB
+"""
 from typing import Iterable
 import json
 import os
@@ -20,11 +22,12 @@ class HandleJson(Commons):
 
     def read_json(self)->Iterable:
         try:
-            with open(self.infile, 'r') as f:
+            with open(self.infile, 'rb') as f:
                 data = json.load(f)
-                for k, v in data.items():
+                for k,v in data.items():
                     yield (k, v)
         except Exception as e:
+            print('###error: ', e)
             yield
 
     def search_value(self, keys:list)->list:
