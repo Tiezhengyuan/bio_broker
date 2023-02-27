@@ -50,12 +50,11 @@ class Utils:
     @staticmethod
     def update_dict(input:dict, key, val):
         if key not in ('', '-', None):
-            if key in input:
-                if isinstance(input[key], list) \
-                    and val not in input[key]:
-                    input[key].append(val)
-            else:
-                input[key] = [val,]
+            if key not in input: input[key] = []
+            tmp = val if isinstance(val, list) else [val,]
+            for t in tmp:
+                if t not in input[key]:
+                    input[key].append(t)
 
     @staticmethod
     def get_deep_value(input:dict, keys:list):

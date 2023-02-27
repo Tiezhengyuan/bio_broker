@@ -25,17 +25,16 @@ class ProcessGene(Commons):
         process *.gz and store map in cache
         '''
         # create new json in cache dir
-        # file_names = ['gene2accession', 'gene2refseq', 'gene2pubmed', \
-        #     'gene2go', 'gene2ensembl', ]
-        # for file_name in file_names:
-        #     self.map_taxonomy_gene(file_name, tax_id)
+        file_names = ['gene2accession', 'gene2refseq', 'gene2pubmed', \
+            'gene2go', 'gene2ensembl', ]
+        for file_name in file_names:
+            self.map_taxonomy_gene(file_name, tax_id)
         
-        # self.parse_orthologs(tax_id)
-        # self.parse_neighbors(tax_id)
-        # self.parse_info(tax_id)
-        # self.parse_history(tax_id)
-        # self.parse_group(tax_id)
-        # # TODO: debugging needed
+        self.parse_orthologs(tax_id)
+        self.parse_neighbors(tax_id)
+        self.parse_info(tax_id)
+        self.parse_history(tax_id)
+        self.parse_group(tax_id)
         #parse and save in map cache
         self.parse_uniprotkb()
 
@@ -147,55 +146,7 @@ class ProcessGene(Commons):
             outfile = os.path.join(outdir, f"{tax_id}_{file_name}.jtxt")
             Jtxt(outfile).save_jtxt(map)
                            
-    def parse_uniprotkb(self):
-        '''
-        parse NCBI_protein_accession ~ UniProtKB_protein_accession
-        source file: *_gene_refseq_uniprotkb_collab.gz
-        '''
-        outfile = os.path.join(self.dir_map, "gene_refseq_uniprotkb_collab.jtxt")
-        infile = os.path.join(self.dir_source, "gene_refseq_uniprotkb_collab.gz")
-        with File(infile).readonly_handle() as f:
-            # skip the first line
-            map = {}
-            header = next(f)
-            print(header.rstrip().split('\t'))
-            for line in f:
-                val1, val2 = line.rstrip().split('\t')
-                # print(val1, val2)
-                Utils.update_dict(map, val1, val2)
-                if len(map) >= 1e3:
-                    # append data as one line
-                    Jtxt(outfile).append_jtxt(map)
-                    # reset map
-                    map = {}
-            else:
-                if map:
-                    # append remaining data as one line
-                    Jtxt(outfile).append_jtxt(map)
-                        
 
-    def parse_(self, tax_id:str, name:str, func:Callable=None):
-        '''
-        parse geneid ~ other info
-        source file: gene_*.gz
-        '''
-        map = {}
-        mapfile = os.path.join(self.dir_source, f"{name}.gz")
-        with File(mapfile).readonly_handle() as f:
-            col_names = next(f).strip().split('\t')
-            for line in f:
-                items = line.rstrip().split('\t')
-                if tax_id == items[0]:
-                    rec = {}
-                    for k,v in zip(col_names, items):
-                        rec[k] = v.split('|') if '|' in v else v
-                    if func is not None:
-                        func(rec)
-                    Utils.update_dict(map, items[1], rec) 
-        # save updated data
-        outdir = Dir.cascade_dir(self.dir_map, tax_id, self.cascade_num)
-        outfile = os.path.join(outdir, f"{tax_id}_{name}.jtxt")
-        Jtxt(outfile).save_jtxt(map)
 
     def parse_neighbors(self, tax_id:str):      
         '''
@@ -233,6 +184,56 @@ class ProcessGene(Commons):
         '''
         self.parse_(tax_id, 'gene_info', ProcessGene.parse_dbxrefs)
 
+
+    def parse_(self, tax_id:str, name:str, func:Callable=None):
+        '''
+        parse geneid ~ other info
+        source file: gene_*.gz
+        '''
+        map = {}
+        mapfile = os.path.join(self.dir_source, f"{name}.gz")
+        with File(mapfile).readonly_handle() as f:
+            col_names = next(f).strip().split('\t')
+            for line in f:
+                items = line.rstrip().split('\t')
+                if tax_id == items[0]:
+                    rec = {}
+                    for k,v in zip(col_names, items):
+                        rec[k] = v.split('|') if '|' in v else v
+                    if func is not None:
+                        func(rec)
+                    Utils.update_dict(map, items[1], rec) 
+        # save updated data
+        outdir = Dir.cascade_dir(self.dir_map, tax_id, self.cascade_num)
+        outfile = os.path.join(outdir, f"{tax_id}_{name}.jtxt")
+        Jtxt(outfile).save_jtxt(map)
+
+    def parse_uniprotkb(self):
+        '''
+        parse NCBI_protein_accession ~ UniProtKB_protein_accession
+        source file: *_gene_refseq_uniprotkb_collab.gz
+        '''
+        outfile = os.path.join(self.dir_cache, "gene_refseq_uniprotkb_collab.jtxt")
+        infile = os.path.join(self.dir_source, "gene_refseq_uniprotkb_collab.gz")
+        with File(infile).readonly_handle() as f:
+            # skip the first line
+            map = {}
+            header = next(f)
+            print(header.rstrip().split('\t'))
+            for line in f:
+                val1, val2 = line.rstrip().split('\t')
+                # print(val1, val2)
+                Utils.update_dict(map, val1, val2)
+                if len(map) >= 1e3:
+                    # append data as one line
+                    Jtxt(outfile).append_jtxt(map)
+                    # reset map
+                    map = {}
+            else:
+                if map:
+                    # append remaining data as one line
+                    Jtxt(outfile).append_jtxt(map)
+                        
     @staticmethod
     def parse_dbxrefs(rec:dict):
         if rec.get("dbXrefs") not in (None, '-'):

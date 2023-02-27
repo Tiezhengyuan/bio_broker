@@ -8,13 +8,15 @@ from utils.file import File
 from utils.dir import Dir
 from utils.utils import Utils
 from annotation.map import Map
+from utils.handle_json import HandleJson
+from utils.jtxt import Jtxt
 
 class MapGene(Map):
 
     def __init__(self):
         super(MapGene, self).__init__()
 
-    def process(self, tax_id:str):
+    def process_taxonomy(self, tax_id:str):
         # db = 'entrez'
         infile = f"{tax_id}_gene2accession.jtxt"
         self.get_map(infile, 'Symbol', lambda x: list(set(x)))
@@ -28,7 +30,10 @@ class MapGene(Map):
         self.get_map(infile, "Ensembl")
         self.get_map(infile, "MIM")
         self.get_map(infile, "HGNC")
-        
+
+        infile = f"{tax_id}_gene2refseq.jtxt"
+        self.get_map(infile, "protein_accession.version", lambda x: list(set(x)))
+
         infile = f"{tax_id}_gene2go.jtxt"
         self.get_map(infile, "GO_ID", lambda x: list(set(x)))
 
@@ -39,45 +44,38 @@ class MapGene(Map):
         self.get_intra_map(infile, "Ensembl_rna_identifier", "GeneID")
 
         #parse uniprotkb
+        self.map_gene_to_uniprotkb(tax_id)
 
-    def geneid_to_symbol(self, tax_id:str):
-        '''
-        geneid ~ gene symbols
-        '''
-        return self.get_map(f"{tax_id}_gene2accession.json", 'Symbol')
 
-    def geneid_to_chromosome(self, tax_id:str):
+    def map_gene_to_uniprotkb(self, tax_id:str):
         '''
-        geneid ~ chromosomes
+        source: cache\gene_refseq_uniprotkb_collab.jtxt
+            NCBI_protein_accession ~ UniProtKB_protein_accession
+        source: cache\<tax_id>\protein_accession.version_GeneID.json
+            protein_accession.version ~ GeneID
         '''
-        return self.get_map(f"{tax_id}_gene_info.json", 'chromosome')
+        map, rev_map = {}, {}
+        # protein accession ~ geneid
+        proacc_geneid = Map().get_map_cache(
+           ["taxonomy", tax_id, "protein_accession.version", "GeneID"]
+        )
+        # protein accession ~uniprotkb accession
+        infile = os.path.join(self.dir_cache, 'gene_refseq_uniprotkb_collab.jtxt')
+        handle = Jtxt(infile).read_jtxt()
+        for pro_acc, uniprotkb_acc_list in handle:
+            if pro_acc in proacc_geneid:
+                for geneid in proacc_geneid[pro_acc]:
+                    Utils.update_dict(map, geneid, uniprotkb_acc_list)
+                for acc in uniprotkb_acc_list:
+                    Utils.update_dict(map, acc, proacc_geneid[pro_acc])
+                    # print(geneid, pro_acc, )
+        # save map and rev_map
+        target_term = 'UniProtKB_protein_accession'
+        tax_dir = Dir.cascade_dir(self.dir_map, tax_id, self.cascade_num)
+        self.save_map_cache(map, ['taxonomy', tax_id, 'GeneID', target_term,], tax_dir)
+        self.save_map_cache(rev_map, ['taxonomy', tax_id, target_term, 'GeneID',], tax_dir)
 
-    def geneid_to_start_position(self, tax_id:str):
-        '''
-        geneid ~ start position on chromosome
-        '''
-        return self.get_map(f"{tax_id}_gene2accession.json", \
-                    'start_position_on_the_genomic_accession')
 
-    def ensembl_geneacc_to_geneid(self, tax_id:str):
-        '''
-        Ensembl accession ENSG... ~ geneid
-        '''
-        return self.get_intra_map(f"{tax_id}_gene2ensembl.json", \
-                        "Ensembl_gene_identifier", "GeneID")
 
-    def ensembl_proacc_to_geneid(self, tax_id:str):
-        '''
-        Ensembl protein accession ENSP... ~ geneid
-        '''
-        return self.get_intra_map(f"{tax_id}_gene2ensembl.json", \
-                        "Ensembl_protein_identifier", "GeneID")
-
-    def ensembl_rnaacc_to_geneid(self, tax_id:str):
-        '''
-        Ensembl transcript accession ENSP... ~ geneid
-        '''
-        return self.get_intra_map(f"{tax_id}_gene2ensembl.json", \
-                        "Ensembl_rna_identifier", "GeneID")
     
 

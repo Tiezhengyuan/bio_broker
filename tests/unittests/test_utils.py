@@ -47,6 +47,9 @@ class Test_(TestCase):
         [{'a':[1,]}, 'a', 1, {'a':[1,]}],
         [{'a':[0,]}, 'a', 1, {'a':[0,1,]}],
         [{'a':[1,]}, 'b', 2, {'a':[1,],'b':[2,]}],
+        # val is list
+        [{}, 'a', [1,2], {'a':[1,2]}],
+        [{'a':[1]}, 'a', [1,2], {'a':[1,2]}],
     )
     @unpack
     def test_update_dict(self, input, key, val, expect):

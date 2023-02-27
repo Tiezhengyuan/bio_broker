@@ -39,9 +39,10 @@ class Jtxt(Commons):
                         yield (k,v)
 
     def append_jtxt(self, input:dict):
-        with open(self.file, 'a') as f:
+        with open(self.file, 'a+') as f:
             line = json.dumps(input)
             f.write(line+'\n')
+            # print(f"Append data into {self.file}")
         return True
     
     def search_jtxt(self, keys:list):

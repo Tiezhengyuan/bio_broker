@@ -24,6 +24,7 @@ class Map(Commons):
         infile = os.path.join(tax_dir, file_name)
         handle = Jtxt(infile).read_jtxt()
         for uid, terms in handle:
+            # print(uid, terms)
             rec = []
             for term in terms:
                 if term.get(target_term) not in (rec, '-', None):
@@ -108,3 +109,16 @@ class Map(Commons):
         c = HandleJson(self.json_cache)
         json_path = c.search_value(keys)
         return HandleJson(json_path).read_json()
+
+    def get_map_cache(self, keys:list)->dict:
+        '''
+        get map cache as dict
+        '''
+        c = HandleJson(self.json_cache)
+        json_path = c.search_value(keys)
+        try:
+            with open(json_path[0], 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            print(e)
+        return {}
