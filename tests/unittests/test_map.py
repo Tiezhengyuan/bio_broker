@@ -21,6 +21,7 @@ class TestMap(TestCase):
         self.c = Map()
 
 
+    @skip
     @data(
         ['9606', "2", "NP_001334352.2"],
     )

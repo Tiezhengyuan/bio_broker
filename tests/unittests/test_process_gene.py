@@ -20,59 +20,22 @@ class TestProcessGene(TestCase):
     def setUp(self):
         self.c = ProcessGene()
 
+    # @skip
     @mock.patch.dict(os.environ, env)
-    def test_process(self):
-        self.c.process_map('9606')
-
-
-    @skip
-    @mock.patch.dict(os.environ, env)
-    def test_gene_to_accession(self):
-        self.c.gene_to_accession('9606')
+    def test_process_taxonomy_entrez(self):
+        self.c.process_taxonomy_entrez('9606')
 
     @skip
     @mock.patch.dict(os.environ, env)
-    def test_gene_to_refseq(self):
-        self.c.gene_to_refseq()
-
-    @skip
-    @mock.patch.dict(os.environ, env)
-    def test_gene_to_pubmed(self):
-        self.c.gene_to_pubmed('9606')
-
-    @skip
-    @mock.patch.dict(os.environ, env)
-    def test_gene_to_go(self):
-        self.c.gene_to_go('9606')
-
-    @skip
-    @mock.patch.dict(os.environ, env)
-    def test_gene_to_ensembl(self):
-        self.c.gene_to_ensembl('9606')
+    def test_parse_taxonomy_gene2(self):
+        handle = self.c.parse_taxonomy_gene2('gene2accession', '9606')
+        res = next(handle)
+        assert '1' in res
 
 
-    @skip
-    @mock.patch.dict(os.environ, env)
-    def test_parse_uniprotkb(self):
-        self.c.parse_uniprotkb('9606')
+    # @skip
+    # @mock.patch.dict(os.environ, env)
+    # def test_parse_uniprotkb(self):
+    #     outfile = ''
+    #     self.c.parse_uniprotkb(outfile)
 
-    @skip
-    def test_parse_orthologs(self):
-        self.c.parse_orthologs('9606')
-
-    @skip
-    def test_parse_neighbors(self):
-        self.c.parse_neighbors('9606')
-
-
-    @skip
-    def test_parse_history(self):
-        self.c.parse_history('9606')
-
-    @skip
-    def test_parse_group(self):
-        self.c.parse_group('9606')
-
-    @skip
-    def test_parse_info(self):
-        self.c.parse_info('9606')

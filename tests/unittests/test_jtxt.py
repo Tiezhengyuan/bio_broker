@@ -3,7 +3,7 @@ Test class
 '''
 from unittest import TestCase, mock, skip
 from ddt import ddt, data, unpack
-import os
+import os, json
 from copy import deepcopy
 from utils.jtxt import Jtxt
 
@@ -19,6 +19,8 @@ class TestJtxt(TestCase):
 
     @mock.patch.dict(os.environ, env)
     def setUp(self):
+        if os.path.isfile(self.jtxt_file):
+            os.remove(self.jtxt_file)
         self.c = Jtxt(self.jtxt_file)
 
     @mock.patch.dict(os.environ, env)
@@ -28,26 +30,18 @@ class TestJtxt(TestCase):
 
     # @skip
     @data(
-        [{}, True, {}],
+        [{}, [{}]],
         [
             {'a':1, 'b':[1,2], 'c':[{'a':1},{'a':2},], 'd':'', 'e':None},
-            True,
-            {'a':1, 'b':[1,2], 'c':[{'a':1},{'a':2},], 'd':'', 'e':None},
-        ],
-        [
-            {'a':1, 'b':[1,2], 'c':[{'a':1},{'a':2},], 'd':'', 'e':None},
-            None,
-            {'a':1}
+            [{'a':1, 'b':[1,2], 'c':[{'a':1},{'a':2},], 'd':'', 'e':None}],
         ],
     )
     @unpack
-    def test_handle_jtxt(self, input, is_oneline, expect):
-        self.c.save_jtxt(input, is_oneline)
-        handle = self.c.read_jtxt(True)
-        res = next(handle)
+    def test_save_jtxt(self, input, expect):
+        self.c.save_jtxt(input, True)
+        res = self.read_file()
         assert res == expect
 
-    # @skip
     @data(
         [ ['a',], [[1]] ],
         [ ['b',], [[1,2]] ],
@@ -75,16 +69,43 @@ class TestJtxt(TestCase):
 
     def test_append_jtxt(self):
         # one line
-        self.c.save_jtxt({'a':0})
+        self.c.save_jtxt({1:{'a':0}})
 
         # two lines
-        self.c.append_jtxt({'a':1})
-        handle = self.c.read_jtxt(True)
+        self.c.append_jtxt({2:{'a':1}})
+        handle = self.c.read_jtxt()
         res = next(handle)
         assert res == {'a':0}
         assert len(list(handle)) == 1
 
         # three lines
-        self.c.append_jtxt({'b':2})
-        handle = self.c.read_jtxt(True)
+        self.c.append_jtxt({3:{'b':2}})
+        handle = self.c.read_jtxt()
         assert len(list(handle)) == 3
+
+    def test_merge_jtxt(self):
+        #empty file
+        self.c.merge_jtxt('id', {1:{'id':1,'name':'a'}})
+        res = self.read_file()
+        assert res == [{'id': 1, 'name': 'a'}]
+
+        #merge record
+        self.c.merge_jtxt('id', {1:{'id':1,'age':4}})
+        res = self.read_file()
+        assert res == [{'id': 1, 'name': 'a', 'age': 4}]
+
+        # update record
+        self.c.merge_jtxt('id', {1:{'id':1,'age':5}})
+        res = self.read_file()
+        assert res == [{'id': 1, 'name': 'a', 'age': 5}]
+
+        #add record
+        self.c.merge_jtxt('id', {2:{'id':2,'name':'b'}})
+        res = self.read_file()
+        assert res == [{'id': 1, 'name': 'a', 'age': 5}, {'id': 2, 'name': 'b'}]
+    
+
+    def read_file(self):
+        with open(self.jtxt_file, 'r') as f:
+            res = [json.loads(i) for i in f.readlines()]
+            return res

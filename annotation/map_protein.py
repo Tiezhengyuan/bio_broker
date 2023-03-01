@@ -13,6 +13,7 @@ from utils.dir import Dir
 from utils.utils import Utils
 from utils.handle_json import HandleJson
 from annotation.map import Map
+from annotation.map_cache import MapCache
 from database.swissprot import Swissprot
 
 class MapProtein(Map):
@@ -32,6 +33,7 @@ class MapProtein(Map):
             key1, key2 = keys1[-1], keys2[-1]
             handle = Swissprot().parse_protein()
             map = self.map_term(handle, keys1, keys2)
-            self.save_map_cache(map, key1, key2, db)
+            outdir = os.path.join(self.dir_cache, db)
+            MapCache([db, key1, key2]).save_map_cache(map, outdir)
     
 

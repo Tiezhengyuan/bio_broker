@@ -70,3 +70,36 @@ class Test_(TestCase):
     def test_get_deep_value(self, input, keys, expect):
         res = Utils.get_deep_value(input, keys)
         assert res == expect
+
+    @data(
+        [{'a':3}, {3:['a']}],
+        [
+            {'a':[1,2], 'b':[2,3]},
+            {1: ['a'], 2:['a','b'], 3: ['b']}
+        ],
+        [
+            {'a':1, 'b':'1', 'c':(1,'3'), 'd':{'d':0}, 'f':None},
+            {1: ['a'], '1': ['b'], (1, '3'): ['c']}
+        ],
+        # alternative input
+        [{}, {}],
+        ['wrong', None],
+    )
+    @unpack
+    def test_switch_key_value(self, input, expect):
+        res = Utils.switch_key_value(input)
+        assert res == expect
+    
+    @data(
+        # add new
+        [{'a':1}, {'b':[1,2]}, {'a': 1, 'b': [1, 2]}],
+        # update
+        [{'a':[1]}, {'a':[1,2]}, {'a': [1, 2]}],
+        [{'a':[{'b':1}]}, {'a':[{'b':2}]}, {'a': [{'b': 1}, {'b': 2}]}],
+        # 
+        [{'a':1}, {}, {'a': 1}],
+    )
+    @unpack
+    def test_mrege_dict(self, dict1, dict2, expect):
+        res = Utils.merge_dict(dict1,dict2)
+        assert res == expect

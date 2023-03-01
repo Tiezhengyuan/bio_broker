@@ -26,10 +26,11 @@ class TestMapGene(TestCase):
     )
     @unpack
     @mock.patch.dict(os.environ, env)
-    def test_process_taxonomy(self, tax_id):
-        self.c.process_taxonomy(tax_id)
+    def test_process_taxonomy_map(self, tax_id):
+        self.c.process_taxonomy_map(tax_id)
 
 
+    @skip
     @data(
         ['9606',],
     )

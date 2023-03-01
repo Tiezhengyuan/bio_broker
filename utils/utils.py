@@ -50,7 +50,8 @@ class Utils:
     @staticmethod
     def update_dict(input:dict, key, val):
         if key not in ('', '-', None):
-            if key not in input: input[key] = []
+            if key not in input:
+                input[key] = []
             tmp = val if isinstance(val, list) else [val,]
             for t in tmp:
                 if t not in input[key]:
@@ -91,5 +92,25 @@ class Utils:
         values of corresponding keys between d1 and d2
         should match to each other
         '''
-        # d = deepcopy(d1)
-        pass
+        merged = deepcopy(d1)
+        for k in d1:
+            if k in d2:
+                Utils.update_dict(merged, k, d2[k])
+                del d2[k]
+        if d2:
+            merged.update(d2)
+        return merged
+
+    @staticmethod
+    def switch_key_value(input:dict)->dict:
+        '''
+        switch key ~ value of a dictionary
+        '''
+        if not isinstance(input, dict):
+            return None
+        new = {}
+        for key,val in input.items():
+            for v in val if isinstance(val, list) else [val,]:
+                if type(v) in (str, int, tuple):
+                    Utils.update_dict(new, v, key)
+        return new

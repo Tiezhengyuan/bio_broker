@@ -8,17 +8,18 @@ from utils.file import File
 from utils.dir import Dir
 from utils.handle_json import HandleJson
 from utils.jtxt import Jtxt
+from annotation.map_cache import MapCache
 
 class Map(Commons):
     def __init__(self):
         super(Map, self).__init__()
 
-    def get_map(self, file_name:str, target_term:str, func:Callable=None)->tuple:
+    def get_map0(self, file_name:str, key1_name:str, key2:str, func:Callable=None)->tuple:
         '''
         gene uid ~ <terms>
         Note: local cache should exist
         '''
-        map, rev_map = {}, {}
+        map = {}
         tax_id = file_name.split('_', 2)[0]
         tax_dir = Dir.cascade_dir(self.dir_map, tax_id, self.cascade_num)
         infile = os.path.join(tax_dir, file_name)
@@ -27,48 +28,47 @@ class Map(Commons):
             # print(uid, terms)
             rec = []
             for term in terms:
-                if term.get(target_term) not in (rec, '-', None):
-                    if isinstance(term[target_term], list):
-                        rec += term[target_term]
+                if term.get(key2) not in (rec, '-', None):
+                    if isinstance(term[key2], list):
+                        rec += term[key2]
                     else:
-                        rec.append(term[target_term])
+                        rec.append(term[key2])
             map[uid] = rec if func is None else func(rec)
-        # reverse mapping and remove duplicates
-        for k, vals in map.items():
-            for v in vals:
-                if v in rev_map:
-                    if k not in rev_map[v]:
-                        rev_map[v].append(k)
-                else:
-                    rev_map[v] = [k,]
         #save map
-        self.save_map_cache(map, ['taxonomy', tax_id, 'GeneID', target_term,], tax_dir)
-        self.save_map_cache(rev_map, ['taxonomy', tax_id, target_term, 'GeneID',], tax_dir)
-        return (map, rev_map)
+        MapCache([key1_name, key2,]).save_taxonomy_map(map, tax_id)
+        return map
 
 
-    def get_intra_map(self, file_name:str, key1:str, key2:str)->dict:
+    def get_intra_map(self, jtxt_file:str, key1:str, key2:str)->dict:
         '''
         map key1~key2 within the uid list
         '''
         map = {}
-        tax_id = file_name.split('_', 2)[0]
-        tax_dir = Dir.cascade_dir(self.dir_map, tax_id, self.cascade_num)
-        infile = os.path.join(tax_dir, file_name)
-        handle = Jtxt(infile).read_jtxt()
+        handle = Jtxt(jtxt_file).read_jtxt()
         for _, terms in handle:
             for term in terms:
                 if key1 in term and key2 in term:
+                    # k and v could be list, str, or tuple etc
                     k, v = term[key1], term[key2]
                     if isinstance(k, list):
                         for sub in k:
                             Utils.update_dict(map, sub, v)    
                     else:
-                        Utils.update_dict(map, str(k), v)
-        #save map
-        self.save_map_cache(map, ['taxonomy', tax_id, key1, key2,], tax_dir)
+                        Utils.update_dict(map, k, v)
         return map
 
+    def build_taxonomy_map(self, file_name:str, key1:str, key2:str, func:Callable=None):
+        tax_id = file_name.split('_')[0]
+        tax_dir = Dir.cascade_dir(self.dir_map, tax_id, self.cascade_num)
+        jtxt_file = os.path.join(tax_dir, file_name)
+        # parse data and build map
+        map = self.get_intra_map(jtxt_file, key1, key2)
+        if func:
+            func(map)
+        #save map
+        map_file = MapCache([key1, key2,]).save_taxonomy_map(map, tax_id)
+        return map, map_file
+    
     def map_term(self, handle:Iterable, key1:list, key2:list):
         '''
         map key1 ~ key2
@@ -83,42 +83,13 @@ class Map(Commons):
                     map[k] = val2
         return map
     
-    def save_map_cache(self, map:dict, keys:list, outdir:str=None)->str:
+    
+    def switch_map(self, keys:list)->str:
         '''
-        save map in dictionary to cache directory
+        switch key-value of a certain map cache
         '''
-        if len(keys) < 2:
-            return None
-        # save map
-        if outdir is None: outdir =  self.dir_cache
-        Dir(outdir).init_dir()
-        outfile = os.path.join(outdir, f"{keys[-2]}_{keys[-1]}.json")
-        HandleJson(outfile).save_json(map)
-
-        # update map path stored in self.json_cache
-        local_cache_path = HandleJson(self.json_cache).to_dict()
-        Utils.init_dict(local_cache_path, keys, outfile)
-        HandleJson(self.json_cache).save_json(local_cache_path)
-        return outfile   
-
-    def read_map_cache(self, keys:list)->Iterable:
-        '''
-        read map cache using keys in list
-        for example: {'a':{'b':4}}: keys = ['a', 'b'], return 4
-        '''
-        c = HandleJson(self.json_cache)
-        json_path = c.search_value(keys)
-        return HandleJson(json_path).read_json()
-
-    def get_map_cache(self, keys:list)->dict:
-        '''
-        get map cache as dict
-        '''
-        c = HandleJson(self.json_cache)
-        json_path = c.search_value(keys)
-        try:
-            with open(json_path[0], 'r') as f:
-                return json.load(f)
-        except Exception as e:
-            print(e)
-        return {}
+        map = MapCache(keys).get_map_cache()
+        return MapCache(keys[:-2] + keys[-2:][::-1]).save_map(
+            Utils.switch_key_value(map),
+            os.path.dirname(self.get_map_path(keys))
+        )
