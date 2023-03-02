@@ -10,6 +10,7 @@ class Commons:
         self.dir_download = os.environ.get('DIR_DOWNLOAD', '')
         self.dir_cache = os.environ.get('DIR_CACHE', '')
         self.dir_map = os.path.join(self.dir_cache, 'map')
+        self.dir_chunk_map = os.path.join(self.dir_cache, 'chunk_map')
         self.dir_bin = os.environ.get('DIR_BIN', '')
 
         # default file

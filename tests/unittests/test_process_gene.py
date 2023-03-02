@@ -20,7 +20,7 @@ class TestProcessGene(TestCase):
     def setUp(self):
         self.c = ProcessGene()
 
-    # @skip
+    @skip
     @mock.patch.dict(os.environ, env)
     def test_process_taxonomy_entrez(self):
         self.c.process_taxonomy_entrez('9606')
@@ -33,9 +33,13 @@ class TestProcessGene(TestCase):
         assert '1' in res
 
 
-    # @skip
-    # @mock.patch.dict(os.environ, env)
-    # def test_parse_uniprotkb(self):
-    #     outfile = ''
-    #     self.c.parse_uniprotkb(outfile)
+    @skip
+    @mock.patch.dict(os.environ, env)
+    def test_feed_redis(self):
+        self.c.feed_redis()
 
+    @mock.patch.dict(os.environ, env)
+    def test_parse_acc(self):
+        res = self.c.parse_acc(name_index=1)
+        print('===', res.get('P24935'))
+        print('===', list(res.get('P24935')))

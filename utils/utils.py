@@ -52,10 +52,28 @@ class Utils:
         if key not in ('', '-', None):
             if key not in input:
                 input[key] = []
+            else:
+                if not isinstance(input[key], list):
+                    input[key] = [input[key],]
             tmp = val if isinstance(val, list) else [val,]
             for t in tmp:
                 if t not in input[key]:
                     input[key].append(t)
+   
+    @staticmethod
+    def merge_dict(d1:dict, d2:dict)->dict:
+        '''
+        values of corresponding keys between d1 and d2
+        should match to each other
+        '''
+        merged = deepcopy(d1)
+        for k in d1:
+            if k in d2:
+                Utils.update_dict(merged, k, d2[k])
+                del d2[k]
+        if d2:
+            merged.update(d2)
+        return merged
 
     @staticmethod
     def get_deep_value(input:dict, keys:list):
@@ -86,21 +104,6 @@ class Utils:
                     pool.append((curr_keys, item))
         return val
     
-    @staticmethod
-    def merge_dict(d1:dict, d2:dict)->dict:
-        '''
-        values of corresponding keys between d1 and d2
-        should match to each other
-        '''
-        merged = deepcopy(d1)
-        for k in d1:
-            if k in d2:
-                Utils.update_dict(merged, k, d2[k])
-                del d2[k]
-        if d2:
-            merged.update(d2)
-        return merged
-
     @staticmethod
     def switch_key_value(input:dict)->dict:
         '''

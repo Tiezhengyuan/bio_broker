@@ -5,12 +5,15 @@ from copy import deepcopy
 import os
 import json
 from typing import Iterable, Callable
+import pandas as pd
+
 from utils.commons import Commons
 from utils.file import File
 from utils.dir import Dir
 from utils.utils import Utils
 from utils.jtxt import Jtxt
 from utils.handle_json import HandleJson
+from connector.connect_redis import ConnectRedis
 
 class ProcessGene(Commons):
     db = 'entrez'
@@ -181,7 +184,7 @@ class ProcessGene(Commons):
                     yield map
 
 
-    def parse_ncbi_acc(self, acc_pair:dict):
+    def search_ncbi_acc(self, acc_pair:dict):
         '''
         map NCBI_protein_accession ~ UniProtKB_protein_accession
         source file: *_gene_refseq_uniprotkb_collab.gz
@@ -195,5 +198,36 @@ class ProcessGene(Commons):
                 if uniprot_acc in acc_pair:
                     Utils.update_dict(acc_pair, uniprot_acc, ncbi_acc)
 
+    def parse_acc(self, name_index:int=None)->pd.Series:
+        '''
+        value: NCBI_protein_accession, index: UniProtKB_protein_accession
+        source file: *_gene_refseq_uniprotkb_collab.gz
+        '''
+        if name_index not in (0, 1): name_index = 1
+        value_index = 1 - name_index
+        infile = os.path.join(self.dir_source, "gene_refseq_uniprotkb_collab.gz")
+        df = pd.read_csv(infile, sep='\t', header=0)
+        series = df.iloc[:,value_index].squeeze()
+        series.index =df.iloc[:,name_index]
+        # print(series)
+        return series
 
+
+    def feed_redis(self):
+        '''
+        map NCBI_protein_accession ~ UniProtKB_protein_accession
+        source file: *_gene_refseq_uniprotkb_collab.gz
+        '''
+        rs = ConnectRedis('uniprot_acc')
+        infile = os.path.join(self.dir_source, "gene_refseq_uniprotkb_collab.gz")
+        with File(infile).readonly_handle() as f:
+            # skip the first line
+            _ = next(f)
+            for line in f:
+                ncbi_acc, uniprot_acc = line.rstrip().split('\t')
+                rec = {
+                    'NCBI_protein_accession': [ncbi_acc,],
+                    'UniProtKB_protein_accession': [uniprot_acc,],
+                }
+                rs.put_uniprotkb_acc(uniprot_acc, rec)
 
