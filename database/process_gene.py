@@ -2,6 +2,7 @@
 process gene/DATA
 '''
 from copy import deepcopy
+import itertools
 import os
 import json
 from typing import Iterable, Callable
@@ -23,7 +24,8 @@ class ProcessGene(Commons):
         # store local file is downloaded from NCBI FTP
         self.dir_source = os.path.join(self.dir_download, \
             'NCBI', 'gene', 'DATA')
-        
+        self.tmp_dir = os.path.join(self.dir_source, "tmp_gene_refseq_uniprotkb_collab")
+        Dir(self.tmp_dir).init_dir()
 
     def process_taxonomy_entrez(self, tax_id:str):
         '''
@@ -34,18 +36,17 @@ class ProcessGene(Commons):
         outfile = os.path.join(outdir, f"{tax_id}_{self.db}.jtxt")
         
         #parse and integrate gene data
-        # file_names = ['gene2accession', 'gene2refseq', 'gene2pubmed', \
-        #     'gene2go', 'gene2ensembl', 'gene_info', 'gene_group', \
-        #     'gene_history', 'gene_neighbors', 'gene_orthologs', ]
-        # for file_name in file_names[5:]:
-        #     print(file_name)
-        #     map = self.parse_taxonomy_gene2(file_name, tax_id)
-        #     # save map to cache
-        #     for m in map:
-        #         Jtxt(outfile).merge_jtxt('GeneID', m)
-        
-        # self.format_gene(outfile)
-
+        file_names = ['gene2accession', 'gene2refseq', 'gene2pubmed', \
+            'gene2go', 'gene2ensembl', 'gene_info', 'gene_group', \
+            'gene_history', 'gene_neighbors', 'gene_orthologs', ]
+        for file_name in file_names[5:]:
+            print(file_name)
+            map = self.parse_taxonomy_gene2(file_name, tax_id)
+            # save map to cache
+            for m in map:
+                Jtxt(outfile).merge_jtxt('GeneID', m)
+        # decorate some data format
+        self.format_gene(outfile)
         # parse uniprotkb
         self.parse_uniprotkb(outfile)
 
@@ -160,57 +161,84 @@ class ProcessGene(Commons):
             os.remove(outfile)
             os.rename(tmp, outfile)
 
-    def get_uniprotkb(self)->Iterable:
+
+    def split_gene_refseq_uniprotkb_collab(self):
         '''
-        map NCBI_protein_accession ~ UniProtKB_protein_accession
         source file: *_gene_refseq_uniprotkb_collab.gz
         '''
-        map = {}
         infile = os.path.join(self.dir_source, "gene_refseq_uniprotkb_collab.gz")
-        with File(infile).readonly_handle() as f:
-            # skip the first line
-            header = next(f)
-            # print(header.rstrip().split('\t'))
-            for line in f:
-                val1, val2 = line.rstrip().split('\t')
-                # print(val1, val2)
-                Utils.update_dict(map, val2, val1)
-                if len(map) >= 1e6:
-                    output = deepcopy(map)
-                    map = {}
-                    yield output
+        handle = File(infile).readonly_handle()
+        header = next(handle)
+        map, start = {}, 0
+        for line in handle:
+            start += 1
+            items = line.split('\t')
+            prefix = ProcessGene.convert_prefix(items[1])
+            if prefix not in map:
+                map[prefix] = [line]
             else:
-                if map:
-                    yield map
+                map[prefix].append(line)
+            if start >= 1e5:
+                for k, lines in map.items():
+                    outfile = os.path.join(self.tmp_dir, k)
+                    with open(outfile, 'a+') as f:
+                        f.writelines(lines)
+                map, start = {}, 0
+        else:
+            if map:
+                for k, lines in map.items():
+                    outfile = os.path.join(self.tmp_dir, k)
+                    with open(outfile, 'a+') as f:
+                        f.writelines(lines)
 
-
-    def search_ncbi_acc(self, acc_pair:dict):
+    @staticmethod
+    def convert_prefix(uniprotkb_acc):
         '''
-        map NCBI_protein_accession ~ UniProtKB_protein_accession
-        source file: *_gene_refseq_uniprotkb_collab.gz
+        group uniprotkb accession based on some head letters
         '''
-        infile = os.path.join(self.dir_source, "gene_refseq_uniprotkb_collab.gz")
-        with File(infile).readonly_handle() as f:
-            # skip the first line
-            _ = next(f)
-            for line in f:
-                ncbi_acc, uniprot_acc = line.rstrip().split('\t')
-                if uniprot_acc in acc_pair:
-                    Utils.update_dict(acc_pair, uniprot_acc, ncbi_acc)
+        if uniprotkb_acc[0] == 'A':
+            if uniprotkb_acc[1] == '0':
+                if uniprotkb_acc[2] == 'A':
+                    if uniprotkb_acc[3] == '0':
+                        return 'A0'
+                    elif uniprotkb_acc[3] == '1':
+                        if uniprotkb_acc[4] in 'ABCDEFGHIJ':
+                            return 'A1'
+                        return 'A2'
+                    elif uniprotkb_acc[3] == '2':
+                        return 'A3'
+                    elif uniprotkb_acc[3] == '3':
+                        return 'A4'
+                    elif uniprotkb_acc[3] == '4':
+                        return 'A5'
+                    elif uniprotkb_acc[3] == '5':
+                        return 'A6'
+                    elif uniprotkb_acc[3] == '6':
+                        return 'A7'
+                    elif uniprotkb_acc[3] == '7':
+                        return 'A8'
+                    elif uniprotkb_acc[3] == '8':
+                        return 'A9'
+                    return 'A9'
+                return 'A9'
+            return 'A9'
+        elif uniprotkb_acc[0] in 'BCDEFGHIJK':
+            return 'P1'
+        return 'P2'
 
-    def parse_acc(self, name_index:int=None)->pd.Series:
+    def get_ncbi_acc(self, filename:str)->dict:
         '''
         value: NCBI_protein_accession, index: UniProtKB_protein_accession
         source file: *_gene_refseq_uniprotkb_collab.gz
         '''
-        if name_index not in (0, 1): name_index = 1
-        value_index = 1 - name_index
-        infile = os.path.join(self.dir_source, "gene_refseq_uniprotkb_collab.gz")
-        df = pd.read_csv(infile, sep='\t', header=0)
-        series = df.iloc[:,value_index].squeeze()
-        series.index =df.iloc[:,name_index]
-        # print(series)
-        return series
+        accessions = {}
+        infile = os.path.join(self.tmp_dir, filename)
+        if os.path.isfile(infile):
+            df = pd.read_csv(infile, sep='\t', header=None, names=\
+                ['NCBI_protein_accession', 'UniProtKB_protein_accession'])
+            accessions = df.iloc[:,0].squeeze()
+            accessions.index = df.iloc[:,1]
+        return accessions
 
 
     def feed_redis(self):
@@ -231,3 +259,41 @@ class ProcessGene(Commons):
                 }
                 rs.put_uniprotkb_acc(uniprot_acc, rec)
 
+
+    # def get_uniprotkb(self)->Iterable:
+    #     '''
+    #     map NCBI_protein_accession ~ UniProtKB_protein_accession
+    #     source file: *_gene_refseq_uniprotkb_collab.gz
+    #     '''
+    #     map = {}
+    #     infile = os.path.join(self.dir_source, "gene_refseq_uniprotkb_collab.gz")
+    #     with File(infile).readonly_handle() as f:
+    #         # skip the first line
+    #         header = next(f)
+    #         # print(header.rstrip().split('\t'))
+    #         for line in f:
+    #             val1, val2 = line.rstrip().split('\t')
+    #             # print(val1, val2)
+    #             Utils.update_dict(map, val2, val1)
+    #             if len(map) >= 1e6:
+    #                 output = deepcopy(map)
+    #                 map = {}
+    #                 yield output
+    #         else:
+    #             if map:
+    #                 yield map
+
+
+    # def search_ncbi_acc(self, acc_pair:dict):
+    #     '''
+    #     map NCBI_protein_accession ~ UniProtKB_protein_accession
+    #     source file: *_gene_refseq_uniprotkb_collab.gz
+    #     '''
+    #     infile = os.path.join(self.dir_source, "gene_refseq_uniprotkb_collab.gz")
+    #     with File(infile).readonly_handle() as f:
+    #         # skip the first line
+    #         _ = next(f)
+    #         for line in f:
+    #             ncbi_acc, uniprot_acc = line.rstrip().split('\t')
+    #             if uniprot_acc in acc_pair:
+    #                 Utils.update_dict(acc_pair, uniprot_acc, ncbi_acc)

@@ -1,23 +1,15 @@
 '''
 Test class 
 '''
-from unittest import TestCase, mock, skip
-from ddt import ddt, data, unpack
-import os, sys
-
+from tests.helper import *
 from utils.file import File
-
-DIR_CACHE = "H:\\cache"
-DIR_DOWNLOAD = "H:\\download"
-
-dir_data = os.path.dirname(os.path.dirname(__file__))
 
 
 @ddt
 class TestFile(TestCase):
 
     def setUp(self):
-        self.rows_txt = os.path.join(dir_data, 'rows.txt')
+        self.rows_txt = os.path.join(DIR_DATA, 'rows.txt')
         with open(self.rows_txt, 'w') as f:
             rows = [ str(i) for i in range(10)]
             f.write('\n'.join(rows))
@@ -43,5 +35,5 @@ class TestFile(TestCase):
         assert res == expect
 
     def test_read_dump_file(self):
-        infile = os.path.join(DIR_DOWNLOAD, 'NCBI', 'taxonomy', 'names.dmp')
+        infile = os.path.join(env['DIR_DOWNLOAD'], 'NCBI', 'taxonomy', 'names.dmp')
         File(infile).read_dump_file()

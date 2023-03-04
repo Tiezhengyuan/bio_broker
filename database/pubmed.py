@@ -7,9 +7,9 @@ from Bio import Entrez
 
 from connector.http import HTTP
 from utils.threading import Threading
-from database.myentrez import myEntrez
+from database.ncbi_entrez import NCBIEntrez
 
-class PubMed(myEntrez):
+class PubMed(NCBIEntrez):
     db = 'pubmed'
 
     def __init__(self):

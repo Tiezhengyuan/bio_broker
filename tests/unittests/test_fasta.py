@@ -1,16 +1,9 @@
 '''
 Test class 
 '''
-from unittest import TestCase, mock
-from ddt import ddt, data, unpack
-import os, sys
+from tests.helper import *
 from Bio import SeqIO, Seq, SeqRecord
-
 from biofiles.fasta import FASTA
-
-DIR_CACHE = "F:\\bio_broker\\cache"
-DIR_DOWNLOAD = "F:\\bio_broker\\download"
-DIR_DATA = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
 
 
 @ddt
@@ -46,5 +39,4 @@ class Test_(TestCase):
     def test_fasta_to_dict(self, input, expect_id):
         infile = os.path.join(DIR_DATA, input)
         res = FASTA(infile).fasta_to_dict()
-        print(res)
         assert expect_id in res

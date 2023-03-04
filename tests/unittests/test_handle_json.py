@@ -1,20 +1,17 @@
 '''
 Test class 
 '''
-from unittest import TestCase, mock, skip
-from ddt import ddt, data, unpack
-import os, json
+from tests.helper import *
 
 from utils.handle_json import HandleJson
 
-DIR_CACHE = "H:\\cache"
-DIR_DOWNLOAD = "H:\\download"
 
-dir_data = os.path.dirname(os.path.dirname(__file__))
-infile = os.path.join(dir_data, 'example.json')
+infile = os.path.join(DIR_DATA, 'example.json')
 
 @ddt
 class TestHandleJson(TestCase):
+    
+
     def setUp(self):
         with open(infile, 'w') as f:
             data = {

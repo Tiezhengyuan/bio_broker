@@ -1,12 +1,7 @@
 '''
-Test class 
+Test class ConnectNCBI
 '''
-from unittest import TestCase, mock, skip
-from ddt import ddt, data, unpack
-import os, sys
-
-DIR_CACHE = "F:\\bio_broker\\cache"
-DIR_DOWNLOAD = "F:\\bio_broker\\download"
+from tests.helper import *
 
 from connector.connect_ncbi import ConnectNCBI
 
@@ -16,7 +11,11 @@ class TestConnectNCBI(TestCase):
     def setUp(self):
         self.endpoint = 'ftp.ncbi.nlm.nih.gov'
 
-    @mock.patch.dict(os.environ, {'DIR_DOWNLOAD': DIR_DOWNLOAD})
+    @skip
+    @mock.patch.dict(os.environ, {'DIR_DOWNLOAD': os.getenv('DIR_DOWNLOAD')})
     def test_download_gene_data(self):
         res = ConnectNCBI().download_gene_data()
         print(res)
+
+    def test_(self):
+        print(os.getenv('DIR_DOWNLOAD'))

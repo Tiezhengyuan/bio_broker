@@ -11,9 +11,9 @@ from connector.http import HTTP
 from connector.connect_ftp import ConnectFTP
 from utils.threading import Threading
 from utils.file import File
-from database.myentrez import myEntrez
+from database.ncbi_entrez import NCBIEntrez
 
-class GEO(myEntrez):
+class GEO(NCBIEntrez):
     db = 'gds'
 
     def __init__(self):

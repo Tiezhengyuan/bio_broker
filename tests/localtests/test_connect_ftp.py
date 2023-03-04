@@ -1,12 +1,7 @@
 '''
 Test class 
 '''
-from unittest import TestCase, mock, skip
-from ddt import ddt, data, unpack
-import os, sys
-
-DIR_CACHE = "F:\\bio_broker\\cache"
-DIR_DOWNLOAD = "F:\\bio_broker\\download"
+from tests.helper import *
 
 from connector.connect_ftp import ConnectFTP
 
@@ -23,7 +18,7 @@ class Test_(TestCase):
         ['', True],
     )
     @unpack
-    @mock.patch.dict(os.environ, {'DIR_DOWNLOAD': DIR_DOWNLOAD})
+    @mock.patch.dict(os.environ, env)
     def test_is_dir(self, path, expect):
         res = ConnectFTP(self.endpoint).is_dir(path)
         assert res == expect
@@ -36,7 +31,7 @@ class Test_(TestCase):
         ['geo/series/GSE3nnn/GSE3341/', None, 0],
     )
     @unpack
-    @mock.patch.dict(os.environ, {'DIR_DOWNLOAD': DIR_DOWNLOAD})
+    @mock.patch.dict(os.environ, env)
     def test_download_files(self, path, pattern, expect):
         res = ConnectFTP(self.endpoint).download_files(path, pattern)
         assert len(res) == expect
@@ -46,7 +41,7 @@ class Test_(TestCase):
         ['GSE3341', 'geo/series/GSE3nnn/GSE3341/', None, 3],
     )
     @unpack
-    @mock.patch.dict(os.environ, {'DIR_DOWNLOAD': DIR_DOWNLOAD})
+    @mock.patch.dict(os.environ, env)
     def test_download_tree(self, local_name, path, pattern, expect):
         res = ConnectFTP(self.endpoint).download_tree(
             local_name, path, pattern)
@@ -57,7 +52,7 @@ class Test_(TestCase):
         ['pub/taxonomy/new_taxdump/', 'wrong_name.zip', None, False],
     )
     @unpack
-    @mock.patch.dict(os.environ, {'DIR_DOWNLOAD': DIR_DOWNLOAD})
+    @mock.patch.dict(os.environ, env)
     def test_download_file(self, ftp_path, file_name, local_path, expect):
         res = ConnectFTP(self.endpoint).download_file(
             ftp_path, file_name, local_path)

@@ -1,16 +1,8 @@
 '''
-Test class 
+Test class ProcessGene
 '''
-from unittest import TestCase, mock, skip
-from ddt import ddt, data, unpack
-import os
-
+from tests.helper import *
 from database.process_gene import ProcessGene
-
-env = {
-    'DIR_CACHE': "H:\\cache",
-    'DIR_DOWNLOAD': "H:\\download",
-}
 
 
 @ddt
@@ -38,8 +30,21 @@ class TestProcessGene(TestCase):
     def test_feed_redis(self):
         self.c.feed_redis()
 
+    @data(
+        ['A0A1J0MUK8', 'A0', 'AP_000046.1'],
+        ['P19119', 'P1', 'AP_000032.1'],
+        ['Q96685', 'Q9',  ['AP_000056.1', 'AP_000056']],
+        # no detection
+        ['wrong_acc', 'P1', None],
+        ['P19119', 'wrong', None],
+    )
+    @unpack
     @mock.patch.dict(os.environ, env)
-    def test_parse_acc(self):
-        res = self.c.parse_acc(name_index=1)
-        print('===', res.get('P24935'))
-        print('===', list(res.get('P24935')))
+    def test_parse_ncbi_acc(self, acc, prefix, expect):
+        infile = os.path.join(DIR_DATA, 'gene_refseq_uniprotkb_collab.txt')
+        accessions = self.c.parse_ncbi_acc(infile)
+        res = accessions.get(prefix, {}).get(acc)
+        if type(res) == pd.Series:
+            assert  list(res) == expect
+        else:
+            assert res == expect

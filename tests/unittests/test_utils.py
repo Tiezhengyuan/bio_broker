@@ -1,17 +1,11 @@
 '''
-Test class 
+Test class Utils
 '''
-from unittest import TestCase, mock, skip
-from ddt import ddt, data, unpack
-import os, sys
-
+from tests.helper import *
 from utils.utils import Utils
 
 @ddt
-class Test_(TestCase):
-
-    def setUp(self):
-        pass
+class TestUtils(TestCase):
 
     @skip
     @data(
@@ -103,3 +97,27 @@ class Test_(TestCase):
     def test_mrege_dict(self, dict1, dict2, expect):
         res = Utils.merge_dict(dict1,dict2)
         assert res == expect
+    
+    @data(
+        ['a', [10,]],
+        # ['b', ['ab']],
+        # ['c', [{'a':1}]],
+        # ['wrong', []],
+    )
+    @unpack
+    def test_search_series(self, key, expect):
+        s = pd.Series([10, 'ab', {'a':1}, [2,3,4],20,],
+            index=['a','b','c','d','e'])
+        res = Utils.search_series(s, key)
+        assert res == expect
+
+
+    @data(
+        ['A0A1J0MUK8', ''],
+        # ['Q96678', ''],
+    )
+    @unpack
+    def test_parse_ncbi_acc(self, key, expect):
+        infile = os.path.join(DIR_DATA, 'gene_refseq_uniprotkb_collab.txt')
+        res = Utils.parse_ncbi_acc(infile)
+        # assert res.get(key[:2]) == expect

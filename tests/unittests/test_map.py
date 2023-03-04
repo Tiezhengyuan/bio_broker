@@ -1,16 +1,9 @@
 '''
 Test class 
 '''
-from unittest import TestCase, mock, skip
-from ddt import ddt, data, unpack
-import os
-
+from tests.helper import *
 from annotation.map import Map
 
-env = {
-    'DIR_CACHE': "H:\\cache",
-    'DIR_DOWNLOAD': "H:\\download",
-}
 
 
 @ddt

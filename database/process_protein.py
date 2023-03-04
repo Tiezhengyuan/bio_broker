@@ -5,6 +5,7 @@ from copy import deepcopy
 import itertools
 import os
 import json
+import shutil
 from typing import Iterable, Callable
 import pandas as pd
 
@@ -24,6 +25,8 @@ class ProcessProtein(Commons):
         super(ProcessProtein, self).__init__()
         self.debugging = False if debugging is None else True
         self.expasy_file = os.path.join(self.dir_cache, 'expasy.tjxt')
+
+
     def process_protein(self):
         '''
         protein annotations
@@ -36,25 +39,53 @@ class ProcessProtein(Commons):
                 f.write(json.dumps(rec)+'\n')
         
         # parse NCBI protein accession
+        ProcessGene().split_gene_refseq_uniprotkb_collab()
         self.parse_ncbi_protein()
 
     def parse_ncbi_protein(self):
-        # get Series of ncbi accessions
-        accessions = ProcessGene().parse_acc(name_index=1)
-
-        # scan
         tmp = self.expasy_file + '.tmp'
+        tmp_in = self.expasy_file + '.tmp_in'
+        shutil.copyfile(self.expasy_file, tmp_in)
+        tmp_other = self.expasy_file + '.tmp_other'
+        split_filenames = ['A0', 'A1', 'A2', 'A3', 'A4', 'A5', \
+                'A6', 'A7', 'A8', 'A9', 'P1', 'P2']
         with open(tmp, 'wt') as f:
-            handle = Jtxt(self.expasy_file).read_jtxt()
-            for rec in handle:
-                for item in rec.get('accessions', []):
-                    if item.get('UniProtKB_protein_accession', '-') != '-':
-                        matched = accessions.get(item['UniProtKB_protein_accession'])
-                        if matched is not None:
-                            matched = list(matched) if type(matched)==pd.Series else [matched,]
-                            Utils.update_dict(item, "protein_accession.version", matched)
-                            print('##matched', item)
-                f.write(json.dumps(rec) + '\n')
+            for filename in split_filenames:
+                print(filename)
+                # get Series of ncbi accessions
+                accessions = ProcessGene().get_ncbi_acc(filename)
+                with open(tmp_other, 'wt') as f_other:
+                    handle = Jtxt(tmp_in).read_jtxt()
+                    for rec in handle:
+                        to_other = False
+                        for item in rec.get('accessions', []):
+                            acc = item.get('UniProtKB_protein_accession')
+                            if acc:
+                                prefix = ProcessGene.convert_prefix(acc)
+                                if prefix == filename:
+                                    match = accessions.get(acc)
+                                    if match is not None:
+                                        match = list(match) if type(match)==pd.Series else [match,]
+                                        Utils.update_dict(item, "protein_accession.version", match)
+                                        print('##matched', item)
+                                else:
+                                    to_other = True
+                        if to_other:
+                            f_other.write(json.dumps(rec) + '\n')
+                        else:
+                            f.write(json.dumps(rec) + '\n')
+                # switch
+                tmp_in, tmp_other = tmp_other, tmp_in
+            else:
+                # usually the file tmp_in should be empty
+                handle = Jtxt(tmp_in).read_jtxt()
+                for rec in handle:
+                    Jtxt(tmp).append_jtxt(rec)
+        # remove temporary files
         if self.debugging is False:
+            os.remove(tmp_in)
+            os.remove(tmp_other)
             os.remove(self.expasy_file)
             os.rename(tmp, self.expasy_file)
+
+

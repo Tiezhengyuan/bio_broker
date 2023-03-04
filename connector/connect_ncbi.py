@@ -21,3 +21,14 @@ class ConnectNCBI(ConnectFTP):
             file_pattern = '.gz'
         )
         return local_files
+
+    def download_pubmed(self):
+        '''
+        download PubMed including subdirectories and files
+        '''
+        local_files = self.download_tree(
+            local_name = os.path.join('NCBI', 'pubmed'),
+            ftp_path = 'pubmed',
+            file_pattern = '.gz'
+        )
+        return local_files

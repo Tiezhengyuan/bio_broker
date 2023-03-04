@@ -7,9 +7,9 @@ from Bio import Entrez
 
 from connector.http import HTTP
 from utils.threading import Threading
-from database.myentrez import myEntrez
+from database.ncbi_entrez import NCBIEntrez
 
-class GenBank(myEntrez):
+class GenBank(NCBIEntrez):
     db = 'nucleotide'
 
     def __init__(self):

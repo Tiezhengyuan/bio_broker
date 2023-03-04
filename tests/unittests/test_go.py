@@ -1,10 +1,7 @@
 '''
 Test class 
 '''
-from unittest import TestCase, mock
-from ddt import ddt, data, unpack
-import os, sys
-
+from tests.helper import *
 from ontology.go import GeneOntology
 
 class Test_(TestCase):

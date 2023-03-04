@@ -7,14 +7,14 @@ from zipfile import ZipFile
 import xml.etree.ElementTree as et
 
 from connector.connect_ftp import ConnectFTP
-from database.myentrez import myEntrez
+from database.ncbi_entrez import NCBIEntrez
 from utils.commons import Commons
 from utils.dir import Dir
 from utils.file import File
 from utils.utils import Utils
 
 
-class Taxonomy(myEntrez):
+class Taxonomy(NCBIEntrez):
     db = 'taxonomy'
 
     def __init__(self):

@@ -1,19 +1,10 @@
 '''
 Test class 
 '''
-from unittest import TestCase, mock, skip
-from ddt import ddt, data, unpack
-import os, sys
-
-DIR_CACHE = "H:\\cache"
-DIR_DOWNLOAD = "H:\\download"
+from tests.helper import *
 
 from database.kegg import KEGG
 
-env = {
-    'DIR_CACHE': "H:\\cache",
-    'DIR_DOWNLOAD': "H:\\download",
-}
 
 @ddt
 class TestKEGG(TestCase):

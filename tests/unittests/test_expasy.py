@@ -1,16 +1,9 @@
 '''
 Test class 
 '''
-from unittest import TestCase, mock, skip
-from ddt import ddt, data, unpack
-import os, sys
-
+from tests.helper import *
 from database.expasy import ExPASy
 
-env = {
-    'DIR_CACHE': "H:\\cache",
-    'DIR_DOWNLOAD': "H:\\download",
-}
 
 @ddt
 class TestKEGG(TestCase):

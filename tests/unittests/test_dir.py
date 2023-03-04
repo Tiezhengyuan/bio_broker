@@ -1,13 +1,7 @@
 '''
 Test class 
 '''
-from unittest import TestCase, mock, skip
-from ddt import ddt, data, unpack
-import os, sys
-
-DIR_CACHE = "F:\\bio_broker\\cache"
-DIR_DOWNLOAD = "F:\\bio_broker\\download"
-
+from tests.helper import *
 from utils.dir import Dir
 
 @ddt
@@ -22,7 +16,7 @@ class TestDir(TestCase):
     )
     @unpack
     def test_init_dir(self, path, expect):
-        indir = os.path.join(DIR_DOWNLOAD, path)
+        indir = os.path.join(env['DIR_DOWNLOAD'], path)
         res = Dir(indir).init_dir()
         assert res == expect
 

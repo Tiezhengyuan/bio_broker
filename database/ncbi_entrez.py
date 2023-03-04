@@ -14,9 +14,9 @@ from utils.threading import Threading
 from utils.commons import Commons
 
 
-class myEntrez(Commons):
+class NCBIEntrez(Commons):
     def __init__(self):
-        super(myEntrez, self).__init__()
+        super(NCBIEntrez, self).__init__()
         # self.endpoint = 'https://eutils.ncbi.nlm.nih.gov/entrez/'
 
     

@@ -1,21 +1,13 @@
 '''
 Test class 
 '''
-from unittest import TestCase, mock, skip
-from ddt import ddt, data, unpack
-import os, json
-from copy import deepcopy
+from tests.helper import *
 from utils.jtxt import Jtxt
 
-env = {
-    'DIR_CACHE': "H:\\cache",
-    'DIR_DOWNLOAD': "H:\\download",
-}
-dir_data = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
 
 @ddt
 class TestJtxt(TestCase):
-    jtxt_file = os.path.join(dir_data, 'test_jtxt.jtxt')
+    jtxt_file = os.path.join(DIR_DATA, 'test_jtxt.jtxt')
 
     @mock.patch.dict(os.environ, env)
     def setUp(self):
