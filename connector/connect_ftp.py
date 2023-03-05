@@ -1,7 +1,9 @@
 """
 connect FTP
 """
-import os, sys
+import os
+import time
+from typing import Callable
 from ftplib import FTP
 from utils.dir import Dir
 
@@ -9,11 +11,10 @@ class ConnectFTP:
     def __init__(self, endpoint:str, username:str=None, password:str=None):
         self.endpoint = endpoint
         self.ftp = FTP(self.endpoint)
-        if username and password:
+        if username or password:
             self.ftp.login(username, password)
         else:
             self.ftp.login()
-        # self.ftp.st_pasv(False)
         self.dir_download = os.environ.get('DIR_DOWNLOAD', '')
 
     def is_dir(self, name=str):
@@ -27,6 +28,8 @@ class ConnectFTP:
             pass
         # print('origin dir: ', self.ftp.pwd())
         return False
+    
+
 
     def download_file(self, ftp_path:str, file_name:str, local_path:str=None):
         origin_ftp_path = self.ftp.pwd()
@@ -103,3 +106,4 @@ class ConnectFTP:
             local_files += self.download_files(
                 None, file_pattern, _local_path)
         return local_files
+
