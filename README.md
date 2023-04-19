@@ -3,7 +3,9 @@ bioBroker is a library package of some repositories which include
 tremendous classes and methods that could retrieve, download, and integrate various data.
 Those classes or methods could be middleware of other bioinformatics applications.
 
-Sequence: [a link](https://github.com/Tiezhengyuan/bio_sequence)
+[Sequence (DNA, protein, etc.): ](https://github.com/Tiezhengyuan/bio_sequence)
+[Biological files (.fa, fq, etc.)](https://github.com/Tiezhengyuan/bio_file)
+
 
 # 1. Introduction
 
